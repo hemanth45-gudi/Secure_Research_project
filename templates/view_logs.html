@@ -1,0 +1,120 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .log-container {
+        max-width: 900px;
+        margin: 40px auto;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        backdrop-filter: blur(5px);
+    }
+
+    .log-title {
+        color: #2c3e50;
+        font-weight: 800;
+        border-bottom: 3px solid #3498db;
+        display: inline-block;
+        padding-bottom: 10px;
+        margin-bottom: 30px;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+        border-left: 3px solid #e0e0e0;
+    }
+
+    .log-item {
+        position: relative;
+        margin-bottom: 25px;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s;
+    }
+
+    .log-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .log-dot {
+        position: absolute;
+        left: -39px;
+        top: 20px;
+        width: 20px;
+        height: 20px;
+        background: #3498db;
+        border: 4px solid #fff;
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px #3498db;
+    }
+
+    .log-time {
+        font-size: 0.85rem;
+        color: #95a5a6;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .log-user {
+        color: #e74c3c;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .log-action {
+        color: #34495e;
+        font-size: 1.05rem;
+    }
+
+    .btn-simple {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 25px;
+        border: 2px solid #3498db;
+        color: #3498db;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+
+    .btn-simple:hover {
+        background: #3498db;
+        color: white;
+    }
+</style>
+
+<div class="log-container">
+    <h2 class="log-title">📜 System Audit Trail</h2>
+
+    <div class="timeline">
+        {% for log in logs|reverse %}
+        <div class="log-item">
+            <div class="log-dot"></div>
+            <div class="log-time">{{ log.time }}</div>
+            <div>
+                <span class="log-user">{{ log.user }}</span>
+                <span class="log-action">{{ log.action }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center">
+        <a href="{{ url_for('dashboard') }}" class="btn-simple">
+            &larr; Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

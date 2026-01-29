@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        min-height: 100vh;
+        color: white;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        margin-top: 50px;
+        color: #222;
+        /* Black Text */
+        text-align: center;
+    }
+
+    h2 {
+        color: #000;
+        /* Black Header */
+        text-shadow: none;
+        font-weight: 800;
+        margin-bottom: 20px;
+    }
+
+    .receipt-box {
+        background: #222;
+        /* Keep dark for contrast with green code */
+        color: #00ff00;
+        font-family: 'Courier New', monospace;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        word-break: break-all;
+        font-size: 1.1rem;
+        border: 2px solid #00ff00;
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+    }
+
+    .btn-glow {
+        background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        color: white;
+        padding: 15px 30px;
+        font-weight: bold;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        margin-top: 20px;
+    }
+
+    .btn-glow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(245, 87, 108, 0.6);
+        color: white;
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="glass-card">
+            <h2>🎉 Upload Successful!</h2>
+            <p style="color: #333; font-size: 1.1rem; font-weight: 6;">Your files have been securely encrypted and
+                signed.</p>
+
+            <hr style="border-color: rgba(0,0,0,0.2);">
+
+            <h5 style="color: #000; font-weight: 700;">📜 Your Transaction Receipt</h5>
+            <p style="color: #555;">Copy this code to prove your submission timestamp.</p>
+
+            <div class="receipt-box">
+                {{ receipt }}
+            </div>
+
+            <a href="{{ url_for('dashboard') }}" class="btn-glow">Return to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

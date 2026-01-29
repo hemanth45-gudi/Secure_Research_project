@@ -1,0 +1,233 @@
+/* =========================================
+   1. GLOBAL VARIABLES & RESET
+   ========================================= */
+:root {
+    --primary-color: #4f46e5;    /* Modern Indigo */
+    --primary-hover: #4338ca;
+    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+    --card-bg: #ffffff;
+    --text-main: #1e293b;        /* Dark Slate */
+    --text-muted: #64748b;
+    --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    --radius: 16px;
+}
+
+body {
+    background: var(--bg-gradient);
+    font-family: 'Inter', sans-serif; /* Clean modern font */
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* =========================================
+   2. MAIN CONTAINER CARD
+   ========================================= */
+.container {
+    background: var(--card-bg);
+    max-width: 850px;
+    width: 100%;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    padding: 45px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Top colored bar for visual pop */
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, #4f46e5, #ec4899); /* Indigo to Pink gradient */
+}
+
+/* =========================================
+   3. TYPOGRAPHY
+   ========================================= */
+h2 {
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+}
+
+h3, h4 {
+    font-weight: 600;
+    color: #374151;
+}
+
+hr {
+    margin: 30px 0;
+    border-color: #e5e7eb;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* =========================================
+   4. FORMS & INPUTS
+   ========================================= */
+label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    background-color: #f9fafb;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #fff;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); /* Soft glow */
+    outline: none;
+}
+
+/* =========================================
+   5. BUTTONS (Modern & Flat)
+   ========================================= */
+.btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+}
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px -1px rgba(79, 70, 229, 0.3);
+}
+
+.btn-success { background-color: #10b981; }
+.btn-warning { background-color: #f59e0b; color: white; }
+.btn-danger { background-color: #ef4444; }
+
+/* =========================================
+   6. DASHBOARD LIST (Interactive Cards)
+   ========================================= */
+.list-group-item {
+    border: 1px solid #e5e7eb;
+    margin-bottom: 12px;
+    border-radius: 12px !important;
+    padding: 18px 20px;
+    transition: all 0.2s;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+.list-group-item:hover {
+    transform: translateX(6px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-color: var(--primary-color);
+}
+
+/* Role-specific coloring */
+.list-group-item-warning { background: #fffbeb !important; color: #92400e; } /* Researcher */
+.list-group-item-info { background: #eff6ff !important; color: #1e40af; }    /* Reviewer */
+.list-group-item-dark { background: #f8fafc !important; color: #334155; }    /* Admin */
+.list-group-item-danger { 
+    background: #fef2f2 !important; 
+    color: #dc2626; 
+    justify-content: center; /* Center logout text */
+    margin-top: 20px;
+}
+
+/* =========================================
+   7. TABLES & BADGES
+   ========================================= */
+.table {
+    margin-top: 20px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    background-color: #f3f4f6;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 15px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 14px 15px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+}
+
+/* Hash Code Snippet */
+code {
+    background: #f3f4f6;
+    color: #ec4899; /* Pink text for hashes */
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    font-family: 'Fira Code', monospace;
+    border: 1px solid #e5e7eb;
+}
+
+/* Status Badges */
+.access-expired {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: inline-block;
+    border: 1px solid #fecaca;
+}
+
+/* =========================================
+   8. ALERTS (Flash Messages)
+   ========================================= */
+.alert {
+    border-radius: 10px;
+    border: none;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.alert-success { background: #d1fae5; color: #065f46; }
+.alert-danger { background: #fee2e2; color: #991b1b; }
+.alert-warning { background: #fef3c7; color: #92400e; }

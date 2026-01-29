@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Successful</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        h1 { color: #28a745; margin-bottom: 10px; }
+        p { color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;}
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .btn-download { background: #333; color: white; border: none; }
+        .btn-login { background: #667eea; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>🎉 Welcome, {{ username }}!</h1>
+        <p>Your account has been created successfully.</p>
+        
+        {% if role == 'Researcher' %}
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 20px;">
+            <strong>⚠️ IMPORTANT:</strong> As a Researcher, you must download your 
+            <strong>Private Key</strong> now. You may need to share this securely to prove your identity or sign datasets.
+        </div>
+        {% endif %}
+
+        <textarea id="keyContent" style="display:none;">{{ private_key }}</textarea>
+
+        <button onclick="downloadKey()" class="btn btn-download">
+            📥 Download Private Key
+        </button>
+        
+        <br>
+        <a href="/login" class="btn btn-login">Go to Login</a>
+    </div>
+
+    <script>
+        function downloadKey() {
+            var keyText = document.getElementById("keyContent").value;
+            var username = "{{ username }}";
+            
+            // Create a Blob (file-like object)
+            var blob = new Blob([keyText], { type: "text/plain;charset=utf-8" });
+            
+            // Create a temporary download link
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = username + "_private_key.pem";
+            
+            // Trigger click and cleanup
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>

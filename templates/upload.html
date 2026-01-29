@@ -1,0 +1,207 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+    /* Premium Glassmorphism & Animations */
+    body {
+        background: linear-gradient(135deg, #FF6B6B 0%, #556270 100%);
+        /* Matching Login Theme */
+        min-height: 100vh;
+        color: white;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        margin-top: 30px;
+        color: #222222;
+        /* DARK TEXT */
+    }
+
+    h3 {
+        font-weight: 800;
+        margin-bottom: 20px;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+        color: #222222;
+        /* DARK HEADER */
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #333333;
+        /* DARK LABEL */
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        background: #ffffff;
+        /* WHITE INPUT BACKGROUND */
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        padding: 12px;
+        transition: all 0.3s;
+        color: #000000;
+        /* BLACK INPUT TEXT */
+        font-weight: 600;
+    }
+
+    .form-control::placeholder {
+        color: #888888;
+    }
+
+    .form-control:focus {
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
+        border: 2px solid #556270;
+        color: #000000;
+    }
+
+    .btn-glow {
+        background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        color: white;
+        padding: 15px 30px;
+        font-weight: bold;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        width: 100%;
+        margin-top: 20px;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-glow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(245, 87, 108, 0.6);
+    }
+
+    .file-row {
+        background: rgba(255, 255, 255, 0.5);
+        /* Semi-transparent white */
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        border-left: 6px solid #f5576c;
+        /* Thicker accent */
+        animation: fadeIn 0.5s ease-in-out;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .text-muted {
+        color: #444 !important;
+        /* Dark gray for readable hints */
+        font-weight: 500;
+    }
+
+    /* Input Group Labels */
+    small.text-muted {
+        display: block;
+        margin-top: 5px;
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="glass-card">
+            <h3 class="text-center">🚀 Secure Batch Upload</h3>
+            <p class="text-center mb-4" style="color: white; font-weight: 500;">AES-256 Encrypted & RSA Signed</p>
+
+            <form method="post" enctype="multipart/form-data">
+
+                <!-- Dataset Meta -->
+                <div class="mb-4">
+                    <label class="form-label">Dataset Description</label>
+                    <input type="text" name="description" class="form-control"
+                        placeholder="e.g., Clinical Trial Batch #42" required>
+                </div>
+
+                <!-- Private Key Section -->
+                <div class="mb-4 p-3"
+                    style="background: rgba(255,255,255,0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.6);">
+                    <label class="form-label">🔑 Upload Private Key (PEM)</label>
+                    <input type="file" name="private_key" class="form-control" required>
+                    <small class="text-muted">Required to sign all files in this batch.</small>
+                </div>
+
+                <hr style="border-color: rgba(255,255,255,0.5); opacity: 0.5;">
+
+                <!-- Dynamic File Generation -->
+                <div class="mb-4">
+                    <label class="form-label">How many files do you want to upload?</label>
+                    <input type="number" id="numFiles" class="form-control" min="1" max="10"
+                        placeholder="Enter number (1-10)" onchange="generateFileInputs()">
+                </div>
+
+                <!-- Container for Generated Inputs -->
+                <div id="fileInputsContainer"></div>
+
+                <button type="submit" class="btn btn-glow">🔒 Encrypt & Upload Batch</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a href="{{ url_for('dashboard') }}"
+                    style="color: white; text-decoration: none; font-weight: 600;">&larr; Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function generateFileInputs() {
+        const num = document.getElementById('numFiles').value;
+        const container = document.getElementById('fileInputsContainer');
+        container.innerHTML = ''; // Clear previous
+
+        if (num > 0) {
+            for (let i = 0; i < num; i++) {
+                const row = document.createElement('div');
+                row.className = 'file-row';
+                row.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-7">
+                            <label class="form-label small">File #${i + 1}</label>
+                            <input type="file" name="files[]" class="form-control" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small">Duration (Mins)</label>
+                            <input type="number" name="durations[]" class="form-control" value="1" min="1" required>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(row);
+            }
+        }
+    }
+
+    // Auto-generate 1 row on load
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('numFiles').value = 1;
+        generateFileInputs();
+    });
+</script>
+
+{% endblock %}

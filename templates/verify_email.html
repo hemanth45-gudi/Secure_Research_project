@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);
+        /* Electric Violet */
+        min-height: 100vh;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 40px;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .otp-input {
+        letter-spacing: 15px;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        background: #ffffff;
+        /* White background for clarity */
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        color: #333333;
+        /* Dark text for high contrast */
+        border-radius: 10px;
+        padding: 10px;
+        width: 100%;
+        margin: 20px 0;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-verify {
+        background: #00f260;
+        background: linear-gradient(to right, #00f260, #0575e6);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-weight: bold;
+        width: 100%;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+    }
+
+    .btn-verify:hover {
+        transform: scale(1.02);
+        box-shadow: 0 5px 15px rgba(0, 242, 96, 0.4);
+    }
+</style>
+
+<div class="glass-card">
+    <h2 class="mb-4">📧 Verify Your Email</h2>
+    <p>We've sent a 6-digit code to your email address.</p>
+    <p class="small text-white-50">Please enter it below to complete registration.</p>
+
+    <form method="post">
+        <input type="text" name="otp" class="otp-input" placeholder="000000" maxlength="6" required autofocus>
+
+        <button type="submit" class="btn-verify">VERIFY CODE</button>
+    </form>
+
+    <div class="mt-4">
+        <small>Didn't receive code? <a href="{{ url_for('register') }}"
+                style="color: #fff; text-decoration: underline;">Register Again</a></small>
+    </div>
+</div>
+{% endblock %}

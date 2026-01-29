@@ -1,0 +1,192 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%);
+        /* Fun colorful gradient for admin */
+        min-height: 100vh;
+        color: #333;
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        padding: 40px;
+        margin-top: 30px;
+    }
+
+    h3 {
+        color: #d93a62;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8);
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+        margin-top: 20px;
+    }
+
+    .custom-table th {
+        background: rgba(255, 255, 255, 0.6);
+        color: #d93a62;
+        padding: 15px;
+        text-align: left;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .custom-table th:first-child {
+        border-radius: 10px 0 0 10px;
+    }
+
+    .custom-table th:last-child {
+        border-radius: 0 10px 10px 0;
+    }
+
+    .custom-table tr.user-row {
+        background: rgba(255, 255, 255, 0.7);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .custom-table tr.user-row:hover {
+        transform: scale(1.02);
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .custom-table td {
+        padding: 15px;
+        vertical-align: middle;
+        font-weight: 500;
+    }
+
+    .custom-table td:first-child {
+        border-radius: 10px 0 0 10px;
+    }
+
+    .custom-table td:last-child {
+        border-radius: 0 10px 10px 0;
+    }
+
+    .role-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .role-researcher {
+        background: #a18cd1;
+        background: linear-gradient(to right, #a18cd1 0%, #fbc2eb 100%);
+        color: white;
+    }
+
+    .role-reviewer {
+        background: #84fab0;
+        background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+        color: #0f5132;
+    }
+
+    .role-admin {
+        background: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+        color: #333;
+        border: 1px solid #ccc;
+    }
+
+    .btn-delete {
+        background: #ff5f6d;
+        background: linear-gradient(to right, #ff5f6d, #ffc371);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-weight: bold;
+        transition: all 0.3s;
+        text-decoration: none;
+        box-shadow: 0 4px 6px rgba(255, 95, 109, 0.3);
+    }
+
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(255, 95, 109, 0.5);
+        color: white;
+    }
+
+    .btn-back-pulse {
+        background: white;
+        color: #d93a62;
+        padding: 12px 30px;
+        font-weight: bold;
+        border-radius: 50px;
+        border: 2px solid #d93a62;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 30px;
+    }
+
+    .btn-back-pulse:hover {
+        background: #d93a62;
+        color: white;
+    }
+</style>
+
+<div class="container">
+    <div class="glass-panel">
+        <h3 class="text-center mb-4">👑 Administrative User Management</h3>
+
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Email Address</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for username, user_data in users.items() %}
+                <tr class="user-row">
+                    <td>
+                        <span style="font-size: 1.1rem; font-weight: 700;">{{ username }}</span>
+                    </td>
+                    <td>
+                        <span class="role-badge role-{{ user_data.role|lower }}">{{ user_data.role }}</span>
+                    </td>
+                    <td>
+                        <span style="color: #666;">✉ {{ user_data.email }}</span>
+                    </td>
+                    <td>
+                        {% if username != session['user'] %}
+                        <a href="{{ url_for('delete_user', username=username) }}" class="btn-delete"
+                            onclick="return confirm('Are you sure you want to PERMANENTLY delete user {{ username }}?');">
+                            🗑 Delete
+                        </a>
+                        {% else %}
+                        <span class="text-muted small">(You)</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="text-center">
+            <a href="{{ url_for('dashboard') }}" class="btn-back-pulse">
+                &larr; Return to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

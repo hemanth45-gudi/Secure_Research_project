@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<h4 class="mb-4">Welcome, <b>{{ user }}</b> <span class="badge bg-secondary">{{ role }}</span></h4>
+
+<div class="list-group">
+    {% if role == 'Researcher' %}
+    <a href="{{ url_for('upload_dataset') }}" class="list-group-item list-group-item-action list-group-item-warning">
+        📤 <b>Upload Secure Dataset</b> (Encrypt & Sign)
+    </a>
+    {% endif %}
+
+    {% if role == 'Reviewer' %}
+    <a href="{{ url_for('view_datasets') }}" class="list-group-item list-group-item-action list-group-item-info">
+        👁️ <b>View Shared Datasets</b> (Verify Signature)
+    </a>
+    {% endif %}
+
+    {% if role == 'Admin' %}
+    <a href="{{ url_for('view_logs') }}" class="list-group-item list-group-item-action list-group-item-dark">
+        📜 <b>View Access Logs</b> (Audit)
+    </a>
+    <a href="{{ url_for('manage_users') }}" class="list-group-item list-group-item-action list-group-item-primary mt-2">
+        👑 <b>Manage Users</b> (List/Delete)
+    </a>
+    {% endif %}
+
+    <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-danger mt-3">Logout</a>
+</div>
+{% endblock %}

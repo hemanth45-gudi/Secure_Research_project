@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+    body {
+        /* Deep Tech Blue Background */
+        background: radial-gradient(circle at center, #1a2a6c, #b21f1f, #fdbb2d);
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .login-container {
+        width: 100%;
+        max-width: 400px;
+        perspective: 1000px;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        /* Solid Light Background */
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+        padding: 40px 30px;
+        color: #000;
+        /* Black Text */
+        transition: transform 0.3s ease;
+    }
+
+    .glass-title {
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        margin-bottom: 30px;
+        color: #000;
+        /* Black Header */
+        text-shadow: none;
+    }
+
+    .form-control {
+        background: #ffffff;
+        /* White Input */
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        padding: 15px;
+        color: #000;
+        /* Black Input Text */
+        margin-bottom: 20px;
+        transition: all 0.3s;
+    }
+
+    .form-control::placeholder {
+        color: #666;
+    }
+
+    .form-control:focus {
+        background: #ffffff;
+        border-color: #007bff;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+        color: #000;
+        outline: none;
+    }
+
+    .btn-login {
+        background: #00d2ff;
+        color: #000;
+        /* Dark Text */
+        border: none;
+        border-radius: 5px;
+        padding: 12px;
+        font-weight: 800;
+        width: 100%;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4);
+    }
+
+    .btn-login:hover {
+        background: #00a0c2;
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(0, 210, 255, 0.6);
+    }
+
+    .register-link {
+        color: #333;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s;
+        font-weight: 600;
+    }
+
+    .register-link:hover {
+        color: #000;
+        text-decoration: underline;
+    }
+
+    .icon-lock {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        display: block;
+        color: #333;
+    }
+</style>
+
+<div class="login-container">
+    <div class="glass-card text-center">
+        <div class="icon-lock">🛡️</div>
+        <h2 class="glass-title">Access Portal</h2>
+
+        <form method="post">
+            <input type="text" name="username" class="form-control" placeholder="USERNAME" required>
+            <input type="password" name="password" class="form-control" placeholder="PASSWORD" required>
+
+            <button type="submit" class="btn-login">Authenticate</button>
+        </form>
+
+        <div class="mt-4">
+            <a href="{{ url_for('register') }}" class="register-link">Create Secure Account</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
