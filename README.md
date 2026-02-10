@@ -13,11 +13,11 @@ Express.js
 MongoDB
 
 
-Features
+Features : 
 Authentication – Secure login and user verification using JWT
 API Integration – Backend APIs connected to frontend for dataset upload, access control, and sharing
 
-How to Run the Project
+How to Run the Project: 
 npm install
 npm start
 python app.py
