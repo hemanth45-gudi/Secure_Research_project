@@ -14,10 +14,14 @@ MongoDB,
 
 
 Features : 
-Authentication – Secure login and user verification using JWT    , 
-API Integration – Backend APIs connected to frontend for dataset upload, access control, and sharing
+ Multi-Factor Authentication (Password + Email OTP)   ,
+ Role-Based Access Control (Admin, Researcher, Reviewer)  , 
+ Hybrid Encryption (AES for data + RSA for key exchange)   ,
+ Secure Password Storage using SHA-256   ,
+ Secure Dataset Upload & Download   , 
+ Time-Limited Dataset Access ,
+ Activity Logging and Monitoring
 
 How to Run the Project: 
-npm install  
-npm start   
+pip install -r requirements.txt
 python app.py  
