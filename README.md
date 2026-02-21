@@ -1,98 +1,171 @@
-# [START] Secure Research Dataset Sharing System with Time-Limited Access
+🔐 Secure Research Dataset Sharing System (Production Backend Project)
+📌 Project Overview
 
-##   Project Description
+The Secure Research Dataset Sharing System is a production-level web platform designed to securely share sensitive research datasets with controlled and time-limited access.
 
-The **Secure Research Dataset Sharing System** is a web-based platform designed to securely share sensitive research datasets with controlled and time-limited access. The system ensures data confidentiality, integrity, and authorized usage through strong authentication, hybrid encryption techniques, and role-based access control.
-
-It enables researchers to upload datasets securely, allows authorized users to access them within a defined time period, and ensures secure communication using AES and RSA encryption with SHA-256 hashing for password protection.
+The system ensures data confidentiality, integrity, and authorized usage using multi-layer authentication, role-based access control, and hybrid encryption (AES + RSA). It allows researchers to upload encrypted datasets, enables authorized users to access them within a defined time period, and protects data using secure authentication and verification mechanisms.
 
 This platform is ideal for academic institutions, research organizations, and secure data-sharing environments where privacy and controlled access are critical.
 
----
+🎯 Objectives
 
-##    Tech Stack
+Implement secure dataset sharing with controlled access.
 
-* Python
-* Flask
-* HTML
-* CSS
-* JavaScript
-* MongoDB
-* AES Encryption
-* RSA Encryption
-* SHA-256 Hashing
+Ensure data confidentiality using hybrid encryption.
 
----
+Provide role-based access control for different users.
 
-##   Features
+Enable time-limited dataset availability.
 
-### [CRYPTO] Secure Authentication
+Implement strong authentication and authorization mechanisms.
 
-* User login with password and email OTP verification
-* Multi-layer authentication for enhanced security
+Maintain dataset integrity using digital signatures.
 
-###   Role-Based Access Control
+⚙️ Technologies Used
 
-* Admin -> manages users and datasets
-* Researcher -> uploads and shares datasets
-* Reviewer -> accesses shared datasets
+Python
 
-###   Hybrid Encryption Security
+Flask (Backend Framework)
 
-* AES encryption for securing dataset files
-* RSA encryption for secure key exchange
-* End-to-end data protection
+HTML, CSS, JavaScript
 
-###   Password Protection
+MongoDB (Database)
 
-* SHA-256 hashing with salt
-* Prevents password theft and unauthorized access
+JWT Authentication
 
-###    Digital Signature Verification
+AES Encryption (Data Security)
 
-* Ensures dataset authenticity and integrity
-* Prevents tampering or unauthorized modification
+RSA Encryption (Key Exchange)
 
-###   Time-Limited Dataset Access
+SHA-256 Hashing (Password Security)
 
-* Datasets accessible only within defined validity period
-* Automatic access expiration
+Docker (Containerization)
 
-###   API Integration
+Redis (Caching)
 
-* Backend APIs connected to frontend
-* Secure dataset upload and sharing functionality
+AWS S3 / MinIO (Cloud Storage)
 
-###   Secure Dataset Management
+SMTP Email Verification
 
-* Upload, store, and manage research datasets
-* Controlled access permissions
+🔑 Key Features
+🔐 Secure Authentication
 
----
+JWT-based authentication
 
-##   Screenshot
+Email OTP verification
 
-![Project Screenshot](p1-project.png)
-![Project Screenshot](p2-project.png)
-![Project Screenshot](p3-project.png)
-![Project Screenshot](p4-project.png)
-![Project Screenshot](p5-project.png)
-![Project Screenshot](p6-project.png)
+Multi-layer login security
 
----
+Token-based session management
 
-##    How to Run the Project
+👥 Role-Based Access Control
 
-1. Install Python and required dependencies
-2. Install packages:
-   pip install -r requirements.txt
-3. Run the Flask server:
-   python app.py
-4. Open browser:
-   http://127.0.0.1:5000
+Admin → manages users and system logs
 
----
+Researcher → uploads and shares datasets
 
-##     Author
+Reviewer → accesses shared datasets
 
-**Hemanth Gudi**
+🛡️ Hybrid Encryption Security
+
+AES encryption for dataset files
+
+RSA encryption for secure key exchange
+
+End-to-end data protection
+
+🔑 Password Protection
+
+SHA-256 hashing with salt
+
+Secure credential storage
+
+Protection against password theft
+
+✍️ Digital Signature Verification
+
+Ensures dataset authenticity
+
+Prevents tampering or modification
+
+Validates data integrity
+
+⏳ Time-Limited Dataset Access
+
+Datasets accessible only within defined time period
+
+Automatic expiration of access
+
+Controlled data usage
+
+☁️ Secure Cloud Storage
+
+Dataset storage using AWS S3 / MinIO
+
+Secure file upload and download
+
+Encrypted storage access
+
+🚀 Production-Level Backend Architecture
+
+REST API architecture
+
+Docker containerization
+
+Redis caching
+
+Rate limiting and brute-force protection
+
+Secure API endpoints
+
+📡 API Integration
+
+Backend REST APIs
+
+Secure dataset upload and sharing
+
+Role-based API authorization
+
+🖥️ System Architecture
+Client → JWT Authentication → Flask API → Redis Cache → MongoDB → Secure Storage (S3/MinIO)
+▶️ How to Run the Project
+1️⃣ Install dependencies
+pip install -r requirements.txt
+2️⃣ Configure environment variables
+
+Create .env file and add required credentials.
+
+3️⃣ Run the server
+python app.py
+4️⃣ Open in browser
+http://127.0.0.1:5000
+
+## 📸 Example Input
+
+![Secure_Research_project](p1-project.png)
+![Secure_Research_project](p2-project.png)
+![Secure_Research_project](p3-project.png)
+![Secure_Research_project](p4-project.png)
+
+--- 
+
+📊 Project Highlights (Resume Value)
+
+Production-level backend architecture
+
+JWT authentication system
+
+Hybrid encryption implementation
+
+Secure dataset sharing platform
+
+Role-based authorization design
+
+Cloud storage integration
+
+Security-focused system design
+
+👨‍💻 Author
+
+Hemanth Gudi
+Computer Science Student | Full Stack Developer | Backend Engineer
