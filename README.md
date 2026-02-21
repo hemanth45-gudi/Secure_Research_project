@@ -1,144 +1,153 @@
-🔐 Secure Research Dataset Sharing System (Production Backend Project)
-📌 Project Overview
+# 🔐 Secure Research Dataset Sharing System (Production Backend Project)
 
-The Secure Research Dataset Sharing System is a production-level web platform designed to securely share sensitive research datasets with controlled and time-limited access.
+## 📌 Project Overview
 
-The system ensures data confidentiality, integrity, and authorized usage using multi-layer authentication, role-based access control, and hybrid encryption (AES + RSA). It allows researchers to upload encrypted datasets, enables authorized users to access them within a defined time period, and protects data using secure authentication and verification mechanisms.
+The **Secure Research Dataset Sharing System** is a production-level web platform designed to securely share sensitive research datasets with controlled and time-limited access.
 
-This platform is ideal for academic institutions, research organizations, and secure data-sharing environments where privacy and controlled access are critical.
+The system ensures **data confidentiality, integrity, and authorized usage** through multi-layer authentication, role-based access control, and hybrid encryption techniques (AES + RSA). It enables researchers to upload encrypted datasets, allows authorized users to access them within a defined time period, and protects data using secure authentication and verification mechanisms.
 
-🎯 Objectives
+This platform is suitable for academic institutions, research organizations, and secure data-sharing environments where privacy and controlled access are critical.
 
-Implement secure dataset sharing with controlled access.
+---
 
-Ensure data confidentiality using hybrid encryption.
+## 🎯 Objectives
 
-Provide role-based access control for different users.
+* Implement secure dataset sharing with controlled access.
+* Ensure data confidentiality using hybrid encryption.
+* Provide role-based access control for different users.
+* Enable time-limited dataset availability.
+* Implement strong authentication and authorization mechanisms.
+* Maintain dataset integrity using digital signatures.
 
-Enable time-limited dataset availability.
+---
 
-Implement strong authentication and authorization mechanisms.
+## ⚙️ Tech Stack
 
-Maintain dataset integrity using digital signatures.
+* **Python**
+* **Flask (Backend Framework)**
+* **MongoDB (Database)**
+* **HTML, CSS, JavaScript (Frontend)**
+* **JWT Authentication**
+* **AES Encryption (Data Security)**
+* **RSA Encryption (Key Exchange)**
+* **SHA-256 Hashing (Password Security)**
+* **Redis (Caching)**
+* **Docker (Containerization)**
+* **AWS S3 / MinIO (Cloud Storage)**
+* **SMTP Email Verification**
 
-⚙️ Technologies Used
+---
 
-Python
+## ⭐ Key Features
 
-Flask (Backend Framework)
+### 🔐 Secure Authentication
 
-HTML, CSS, JavaScript
+* JWT-based authentication
+* Email OTP verification
+* Multi-layer login security
+* Token-based session management
 
-MongoDB (Database)
+### 👥 Role-Based Access Control
 
-JWT Authentication
+* **Admin** → manages users and system logs
+* **Researcher** → uploads and shares datasets
+* **Reviewer** → accesses shared datasets
 
-AES Encryption (Data Security)
+### 🛡 Hybrid Encryption Security
 
-RSA Encryption (Key Exchange)
+* AES encryption for dataset files
+* RSA encryption for secure key exchange
+* End-to-end data protection
 
-SHA-256 Hashing (Password Security)
+### 🔑 Password Protection
 
-Docker (Containerization)
+* SHA-256 hashing with salt
+* Secure credential storage
+* Protection against password theft
 
-Redis (Caching)
+### ✍️ Digital Signature Verification
 
-AWS S3 / MinIO (Cloud Storage)
+* Ensures dataset authenticity
+* Prevents data tampering
+* Validates data integrity
 
-SMTP Email Verification
+### ⏳ Time-Limited Dataset Access
 
-🔑 Key Features
-🔐 Secure Authentication
+* Controlled dataset availability period
+* Automatic access expiration
+* Secure data usage enforcement
 
-JWT-based authentication
+### ☁️ Secure Cloud Storage
 
-Email OTP verification
+* AWS S3 / MinIO integration
+* Secure file upload and download
+* Encrypted storage access
 
-Multi-layer login security
+---
 
-Token-based session management
+## 🚀 Production-Level Backend Architecture
 
-👥 Role-Based Access Control
+* REST API architecture
+* Docker containerization
+* Redis caching
+* Rate limiting and brute-force protection
+* Secure API endpoints
+* Token-based authorization
 
-Admin → manages users and system logs
+---
 
-Researcher → uploads and shares datasets
+## 🖥️ System Architecture
 
-Reviewer → accesses shared datasets
-
-🛡️ Hybrid Encryption Security
-
-AES encryption for dataset files
-
-RSA encryption for secure key exchange
-
-End-to-end data protection
-
-🔑 Password Protection
-
-SHA-256 hashing with salt
-
-Secure credential storage
-
-Protection against password theft
-
-✍️ Digital Signature Verification
-
-Ensures dataset authenticity
-
-Prevents tampering or modification
-
-Validates data integrity
-
-⏳ Time-Limited Dataset Access
-
-Datasets accessible only within defined time period
-
-Automatic expiration of access
-
-Controlled data usage
-
-☁️ Secure Cloud Storage
-
-Dataset storage using AWS S3 / MinIO
-
-Secure file upload and download
-
-Encrypted storage access
-
-🚀 Production-Level Backend Architecture
-
-REST API architecture
-
-Docker containerization
-
-Redis caching
-
-Rate limiting and brute-force protection
-
-Secure API endpoints
-
-📡 API Integration
-
-Backend REST APIs
-
-Secure dataset upload and sharing
-
-Role-based API authorization
-
-🖥️ System Architecture
+```
 Client → JWT Authentication → Flask API → Redis Cache → MongoDB → Secure Storage (S3/MinIO)
-▶️ How to Run the Project
-1️⃣ Install dependencies
+```
+
+---
+
+## 📡 API Capabilities
+
+* Secure dataset upload API
+* Dataset access authorization API
+* Role-based API permissions
+* Authentication and token verification endpoints
+
+---
+
+## 📊 Security Mechanisms
+
+* Hybrid encryption (AES + RSA)
+* Password hashing with SHA-256
+* Digital signature verification
+* Rate limiting protection
+* Secure token management
+
+---
+
+## ▶️ How to Run the Project
+
+### 1️⃣ Install Dependencies
+
+```bash
 pip install -r requirements.txt
-2️⃣ Configure environment variables
+```
 
-Create .env file and add required credentials.
+### 2️⃣ Configure Environment Variables
 
-3️⃣ Run the server
+Create a `.env` file and add required credentials.
+
+### 3️⃣ Run the Server
+
+```bash
 python app.py
-4️⃣ Open in browser
+```
+
+### 4️⃣ Open in Browser
+
+```
 http://127.0.0.1:5000
+```
+
+---
 
 ## 📸 Example Input
 
@@ -147,25 +156,40 @@ http://127.0.0.1:5000
 ![Secure_Research_project](p3-project.png)
 ![Secure_Research_project](p4-project.png)
 
---- 
 
-📊 Project Highlights (Resume Value)
+---
 
-Production-level backend architecture
+## 📊 Project Highlights (Resume Value)
 
-JWT authentication system
+* Production-level backend system design
+* JWT authentication implementation
+* Hybrid encryption architecture
+* Role-based authorization system
+* Secure dataset sharing platform
+* Cloud storage integration
+* Security-focused backend engineering
 
-Hybrid encryption implementation
+---
 
-Secure dataset sharing platform
+## ⚠️ Limitations
 
-Role-based authorization design
+* Requires proper environment configuration.
+* Depends on external cloud storage services.
+* Designed for controlled research environments.
 
-Cloud storage integration
+---
 
-Security-focused system design
+## 🚀 Future Improvements
 
-👨‍💻 Author
+* Multi-factor authentication support.
+* Blockchain-based dataset verification.
+* Microservices architecture.
+* Large-scale distributed deployment.
+* Advanced monitoring and logging system.
 
-Hemanth Gudi
+---
+
+## 👨‍💻 Author
+
+**Hemanth Gudi**
 Computer Science Student | Full Stack Developer | Backend Engineer
