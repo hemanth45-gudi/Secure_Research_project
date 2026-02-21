@@ -7,18 +7,18 @@
  *   getRefreshToken()            - Retrieve refresh token
  *   clearTokens()                - Remove tokens (logout)
  *   authFetch(url, options)      - Fetch wrapper with auto Bearer + refresh logic
- *   loginWithCredentials(u, p)   - POST to /api/login, save tokens, redirect
- *   logout()                     - POST to /api/logout, clear tokens, redirect
+ *   loginWithCredentials(u, p)   - POST to /api/auth/login, save tokens, redirect
+ *   logout()                     - POST to /api/auth/logout, clear tokens, redirect
  */
 
 const TOKEN_KEYS = {
-  access:  'srp_access_token',
+  access: 'srp_access_token',
   refresh: 'srp_refresh_token',
 };
 
 // --  Storage ---------------------------------------------- 
 export function saveTokens(accessToken, refreshToken) {
-  localStorage.setItem(TOKEN_KEYS.access,  accessToken);
+  localStorage.setItem(TOKEN_KEYS.access, accessToken);
   localStorage.setItem(TOKEN_KEYS.refresh, refreshToken);
 }
 
@@ -45,7 +45,7 @@ export function clearTokens() {
 export async function authFetch(url, options = {}) {
   options.headers = options.headers || {};
   options.headers['Authorization'] = `Bearer ${getAccessToken()}`;
-  options.headers['Content-Type']  = options.headers['Content-Type'] || 'application/json';
+  options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
 
   let response = await fetch(url, options);
 
@@ -74,10 +74,10 @@ async function _refreshAccessToken() {
   if (!refreshToken) return false;
 
   try {
-    const res = await fetch('/api/token/refresh', {
-      method:  'POST',
+    const res = await fetch('/api/auth/refresh', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ refresh_token: refreshToken }),
+      body: JSON.stringify({ refresh_token: refreshToken }),
     });
 
     if (!res.ok) return false;
@@ -100,10 +100,10 @@ async function _refreshAccessToken() {
  */
 export async function loginWithCredentials(username, password) {
   try {
-    const res = await fetch('/api/login', {
-      method:  'POST',
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password }),
     });
 
     const data = await res.json();
@@ -128,11 +128,11 @@ export async function logout() {
   const refreshToken = getRefreshToken();
 
   if (refreshToken) {
-    await fetch('/api/logout', {
-      method:  'POST',
+    await fetch('/api/auth/logout', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ refresh_token: refreshToken }),
-    }).catch(() => {});  // Best-effort   always clear locally
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    }).catch(() => { });  // Best-effort   always clear locally
   }
 
   clearTokens();

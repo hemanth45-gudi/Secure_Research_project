@@ -39,14 +39,14 @@ try:
 except Exception as e:
     chk('No-token API client /dashboard', False, str(e))
 
-print('\n=== /api/login tests ===')
+print('\n=== /api/auth/login tests ===')
 
 # Test 3: Bad credentials -> 401 JSON
 try:
-    r = requests.post(f'{BASE}/api/login',
-                      json={'username': 'nobody', 'password': 'wrong'}, timeout=4)
+    r = requests.post(f'{BASE}/api/auth/login',
+                      json={'username': 'nobody', 'password': 'WrongPass123'}, timeout=4)
     body = r.json()
-    chk('Bad creds /api/login -> 401', r.status_code == 401, f'got {r.status_code}')
+    chk('Bad creds /api/auth/login -> 401', r.status_code == 401, f'got {r.status_code}')
     chk('Bad creds code=INVALID_CREDENTIALS', body.get('code') == 'INVALID_CREDENTIALS', str(body))
 except Exception as e:
     chk('Bad creds', False, str(e))
@@ -74,7 +74,7 @@ print('\n=== Refresh & Logout tests ===')
 
 # Test 6: Bad refresh token -> 401
 try:
-    r = requests.post(f'{BASE}/api/token/refresh',
+    r = requests.post(f'{BASE}/api/auth/refresh',
                       json={'refresh_token': 'badtoken'}, timeout=4)
     chk('Bad refresh token -> 401', r.status_code == 401, f'got {r.status_code}')
 except Exception as e:
@@ -82,7 +82,7 @@ except Exception as e:
 
 # Test 7: Logout (no body) -> 200 and cookie cleared
 try:
-    r = requests.post(f'{BASE}/api/logout', json={}, timeout=4)
+    r = requests.post(f'{BASE}/api/auth/logout', json={}, timeout=4)
     chk('Logout -> 200', r.status_code == 200, f'got {r.status_code}')
     # Check Set-Cookie clears the cookie
     cookie_header = r.headers.get('Set-Cookie', '')

@@ -111,12 +111,12 @@
 
 <div class="login-container">
     <div class="glass-card text-center">
-        <div class="icon-lock">  </div>
+        <div class="icon-lock"> </div>
         <h2 class="glass-title">Access Portal</h2>
 
         <!-- JWT Login Form -->
         <form id="loginForm" onsubmit="handleLogin(event)">
-            <input type="text"     id="username" name="username" class="form-control" placeholder="USERNAME" required>
+            <input type="text" id="username" name="username" class="form-control" placeholder="USERNAME" required>
             <input type="password" id="password" name="password" class="form-control" placeholder="PASSWORD" required>
 
             <div id="loginError" style="
@@ -133,50 +133,50 @@
         </div>
 
         <script>
-        async function handleLogin(e) {
-            e.preventDefault();
+            async function handleLogin(e) {
+                e.preventDefault();
 
-            const btn      = document.getElementById('loginBtn');
-            const errBox   = document.getElementById('loginError');
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
+                const btn = document.getElementById('loginBtn');
+                const errBox = document.getElementById('loginError');
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
 
-            // Reset UI
-            errBox.style.display = 'none';
-            btn.disabled    = true;
-            btn.textContent = 'Authenticating ';
+                // Reset UI
+                errBox.style.display = 'none';
+                btn.disabled = true;
+                btn.textContent = 'Authenticating ';
 
-            try {
-                const res  = await fetch('/api/login', {
-                    method:  'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body:    JSON.stringify({ username, password }),
-                });
+                try {
+                    const res = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password }),
+                    });
 
-                const data = await res.json();
+                    const data = await res.json();
 
-                if (res.ok && data.access_token) {
-                    // [OK] Store tokens in localStorage
-                    localStorage.setItem('srp_access_token',  data.access_token);
-                    localStorage.setItem('srp_refresh_token', data.refresh_token);
-                    localStorage.setItem('srp_username',      data.username);
-                    localStorage.setItem('srp_role',          data.role);
+                    if (res.ok && data.access_token) {
+                        // [OK] Store tokens in localStorage
+                        localStorage.setItem('srp_access_token', data.access_token);
+                        localStorage.setItem('srp_refresh_token', data.refresh_token);
+                        localStorage.setItem('srp_username', data.username);
+                        localStorage.setItem('srp_role', data.role);
 
-                    // Redirect to dashboard with token in header (via meta redirect)
-                    window.location.href = '/dashboard';
-                } else {
-                    errBox.textContent     = '  ' + (data.error || 'Invalid credentials');
-                    errBox.style.display   = 'block';
-                    btn.disabled    = false;
+                        // Redirect to dashboard with token in header (via meta redirect)
+                        window.location.href = '/dashboard';
+                    } else {
+                        errBox.textContent = '  ' + (data.error || 'Invalid credentials');
+                        errBox.style.display = 'block';
+                        btn.disabled = false;
+                        btn.textContent = 'Authenticate';
+                    }
+                } catch (err) {
+                    errBox.textContent = '[WARN] Network error. Please try again.';
+                    errBox.style.display = 'block';
+                    btn.disabled = false;
                     btn.textContent = 'Authenticate';
                 }
-            } catch (err) {
-                errBox.textContent   = '[WARN] Network error. Please try again.';
-                errBox.style.display = 'block';
-                btn.disabled    = false;
-                btn.textContent = 'Authenticate';
             }
-        }
         </script>
     </div>
 </div>
