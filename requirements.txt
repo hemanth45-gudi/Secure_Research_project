@@ -2,3 +2,12 @@ flask
 cryptography
 PyJWT
 pymongo
+flask-limiter[redis]
+marshmallow
+flask-caching
+boto3
+redis
+gunicorn
+python-dotenv
+flask-cors
+Werkzeug

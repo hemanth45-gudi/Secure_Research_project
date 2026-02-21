@@ -1,0 +1,11 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+.env
+*.log
+.pytest_cache
+.coverage
+p*.png
+test_jwt.py
+test_api.py
