@@ -10,26 +10,45 @@
 
   <script>
     /**
-     * Global JWT Token Injector
-     * ───────────────────────────────────────────────
-     * On every page load, check if a JWT access token exists in localStorage.
-     * If not on the login/register pages, redirect to /login.
-     * Also patches window.fetch to always send Authorization header.
+     * Global JWT Helper (layout.html)
+     * ─────────────────────────────────────────────────────────
+     * HOW AUTH WORKS:
+     *   • On login, the server sets an HttpOnly cookie `srp_access_token`.
+     *   • Every browser page navigation automatically sends this cookie —
+     *     Flask's jwt_required reads it, no JS needed for page loads.
+     *   • localStorage holds tokens for JS-based fetch() calls only.
+     *   • Server-side 401 on protected routes → Flask redirects to /login.
+     *
+     * This script:
+     *   1. Patches window.fetch to auto-attach Authorization header (for AJAX).
+     *   2. Silently refreshes expired tokens via the refresh token.
+     *   3. Exposes window.jwtLogout() for logout buttons.
      */
     (function () {
-      const PUBLIC_PATHS = ['/login', '/register', '/verify_email', '/', '/api/login'];
-      const isPublic = PUBLIC_PATHS.some(p => window.location.pathname === p || window.location.pathname.startsWith(p));
+      const _originalFetch = window.fetch.bind(window);
 
-      const token = localStorage.getItem('srp_access_token');
-
-      // Guard: redirect to login if no token and on a protected page
-      if (!isPublic && !token) {
-        window.location.href = '/login';
+      // Auto-refresh helper: exchanges refresh_token for a new access_token
+      async function _refreshTokens() {
+        const rt = localStorage.getItem('srp_refresh_token');
+        if (!rt) return false;
+        try {
+          const res = await _originalFetch('/api/token/refresh', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: rt }),
+          });
+          if (!res.ok) return false;
+          const data = await res.json();
+          if (data.access_token) {
+            localStorage.setItem('srp_access_token', data.access_token);
+            return true;
+          }
+        } catch (_) { }
+        return false;
       }
 
-      // Patch fetch to auto-inject Authorization header
-      const _originalFetch = window.fetch.bind(window);
-      window.fetch = function (url, options = {}) {
+      // Patch fetch: attach Bearer token + retry once on TOKEN_EXPIRED
+      window.fetch = async function (url, options = {}) {
         const t = localStorage.getItem('srp_access_token');
         if (t && !String(url).includes('/api/token/refresh')) {
           options.headers = options.headers || {};
@@ -37,19 +56,32 @@
             options.headers['Authorization'] = 'Bearer ' + t;
           }
         }
-        return _originalFetch(url, options);
+
+        let resp = await _originalFetch(url, options);
+
+        // Auto-refresh on TOKEN_EXPIRED
+        if (resp.status === 401) {
+          const clone = await resp.clone().json().catch(() => ({}));
+          if (clone.code === 'TOKEN_EXPIRED') {
+            const ok = await _refreshTokens();
+            if (ok) {
+              options.headers = options.headers || {};
+              options.headers['Authorization'] = 'Bearer ' + localStorage.getItem('srp_access_token');
+              resp = await _originalFetch(url, options);
+            }
+          }
+        }
+        return resp;
       };
 
-      // Global logout helper available on all pages
+      // Global logout — clears HttpOnly cookie (server) + localStorage
       window.jwtLogout = async function () {
         const rt = localStorage.getItem('srp_refresh_token');
-        if (rt) {
-          await _originalFetch('/api/logout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refresh_token: rt }),
-          }).catch(() => { });
-        }
+        await _originalFetch('/api/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: rt || '' }),
+        }).catch(() => { });
         localStorage.clear();
         window.location.href = '/login';
       };

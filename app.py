@@ -415,7 +415,7 @@ def api_login():
     """
     POST /api/login
     Body: { "username": "...", "password": "..." }
-    Returns: { "access_token": "...", "refresh_token": "...", "role": "..." }
+    Returns JSON + sets HttpOnly cookie srp_access_token for browser navigation.
     """
     data = request.get_json(silent=True)
     if not data or 'username' not in data or 'password' not in data:
@@ -445,12 +445,25 @@ def api_login():
         'time':   str(datetime.datetime.now()),
     })
 
-    return jsonify({
+    resp = jsonify({
         'access_token':  tokens['access_token'],
         'refresh_token': tokens['refresh_token'],
         'role':          user['role'],
         'username':      username,
-    }), 200
+    })
+
+    # ✅ Set HttpOnly cookie so browser page navigations carry the JWT automatically.
+    # SameSite=Lax protects against CSRF while allowing same-site navigations.
+    resp.set_cookie(
+        'srp_access_token',
+        tokens['access_token'],
+        httponly=True,           # Not accessible via JS (XSS protection)
+        samesite='Lax',          # Sent on same-site navigations, blocks cross-site
+        max_age=15 * 60,         # Match access token expiry: 15 minutes
+        secure=False,            # Set True in production (requires HTTPS)
+        path='/'
+    )
+    return resp, 200
 
 
 @app.route('/api/token/refresh', methods=['POST'])
@@ -458,7 +471,7 @@ def api_token_refresh():
     """
     POST /api/token/refresh
     Body: { "refresh_token": "..." }
-    Returns: { "access_token": "..." }
+    Returns: { "access_token": "..." } + rotates the HttpOnly cookie.
     """
     data = request.get_json(silent=True)
     if not data or 'refresh_token' not in data:
@@ -477,9 +490,9 @@ def api_token_refresh():
     if not stored:
         return jsonify({'error': 'Refresh token has been revoked', 'code': 'TOKEN_REVOKED'}), 401
 
-    # Issue new access token only
-    import jwt as _jwt
+    # Issue new access token
     from auth import JWT_ACCESS_SECRET, JWT_ACCESS_EXPIRY, JWT_ALGORITHM
+    import jwt as _jwt
     now = datetime.datetime.utcnow()
     new_access_payload = {
         'sub':  payload['sub'],
@@ -490,30 +503,38 @@ def api_token_refresh():
     }
     new_access_token = _jwt.encode(new_access_payload, JWT_ACCESS_SECRET, algorithm=JWT_ALGORITHM)
 
-    return jsonify({'access_token': new_access_token}), 200
+    resp = jsonify({'access_token': new_access_token})
+    # ✅ Rotate the HttpOnly cookie with the new access token
+    resp.set_cookie(
+        'srp_access_token',
+        new_access_token,
+        httponly=True,
+        samesite='Lax',
+        max_age=15 * 60,
+        secure=False,
+        path='/'
+    )
+    return resp, 200
 
 
 @app.route('/api/logout', methods=['POST'])
 def api_logout():
     """
     POST /api/logout
-    Body: { "refresh_token": "..." }
-    Revokes the refresh token from the database.
+    Body: { "refresh_token": "..." }  (optional — also clears cookie)
+    Revokes the refresh token from the database and clears the access token cookie.
     """
-    data = request.get_json(silent=True)
-    if not data or 'refresh_token' not in data:
-        return jsonify({'error': 'refresh_token is required', 'code': 'BAD_REQUEST'}), 400
+    data = request.get_json(silent=True) or {}
+    refresh_token = data.get('refresh_token')
 
-    refresh_token = data['refresh_token']
+    if refresh_token:
+        # Remove from DB — token is now revoked
+        refresh_tokens_col.delete_one({'refresh_token': refresh_token})
 
-    # Remove from DB — token is now revoked
-    result = refresh_tokens_col.delete_one({'refresh_token': refresh_token})
-
-    if result.deleted_count > 0:
-        return jsonify({'message': 'Logged out successfully'}), 200
-    else:
-        # Token wasn't in DB (already revoked or never issued) — still 200
-        return jsonify({'message': 'Token not found or already revoked'}), 200
+    resp = jsonify({'message': 'Logged out successfully'})
+    # ✅ Always clear the HttpOnly cookie on logout
+    resp.delete_cookie('srp_access_token', path='/')
+    return resp, 200
 
 
 if __name__ == '__main__': 
