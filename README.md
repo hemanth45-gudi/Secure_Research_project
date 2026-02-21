@@ -72,7 +72,12 @@ This platform is ideal for academic institutions, research organizations, and se
 
 ## 📸 Screenshot
 
-![Project Screenshot](images/project-image.png)
+![Project Screenshot](p1-project.png)
+![Project Screenshot](p2-project.png)
+![Project Screenshot](p3-project.png)
+![Project Screenshot](p4-project.png)
+![Project Screenshot](p5-project.png)
+![Project Screenshot](p6-project.png)
 
 ---
 
