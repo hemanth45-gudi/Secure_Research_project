@@ -111,7 +111,7 @@
 
 <div class="login-container">
     <div class="glass-card text-center">
-        <div class="icon-lock">🛡️</div>
+        <div class="icon-lock">  </div>
         <h2 class="glass-title">Access Portal</h2>
 
         <!-- JWT Login Form -->
@@ -144,7 +144,7 @@
             // Reset UI
             errBox.style.display = 'none';
             btn.disabled    = true;
-            btn.textContent = 'Authenticating…';
+            btn.textContent = 'Authenticating ';
 
             try {
                 const res  = await fetch('/api/login', {
@@ -156,7 +156,7 @@
                 const data = await res.json();
 
                 if (res.ok && data.access_token) {
-                    // ✅ Store tokens in localStorage
+                    // [OK] Store tokens in localStorage
                     localStorage.setItem('srp_access_token',  data.access_token);
                     localStorage.setItem('srp_refresh_token', data.refresh_token);
                     localStorage.setItem('srp_username',      data.username);
@@ -165,13 +165,13 @@
                     // Redirect to dashboard with token in header (via meta redirect)
                     window.location.href = '/dashboard';
                 } else {
-                    errBox.textContent     = '⛔ ' + (data.error || 'Invalid credentials');
+                    errBox.textContent     = '  ' + (data.error || 'Invalid credentials');
                     errBox.style.display   = 'block';
                     btn.disabled    = false;
                     btn.textContent = 'Authenticate';
                 }
             } catch (err) {
-                errBox.textContent   = '⚠️ Network error. Please try again.';
+                errBox.textContent   = '[WARN] Network error. Please try again.';
                 errBox.style.display = 'block';
                 btn.disabled    = false;
                 btn.textContent = 'Authenticate';

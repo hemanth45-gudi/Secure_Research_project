@@ -1,14 +1,14 @@
 """
-api/datasets_bp.py — Dataset REST API Blueprint
+api/datasets_bp.py   Dataset REST API Blueprint
 =================================================
 Mounted at: /api/datasets/
 
 Endpoints:
-  GET    /api/datasets/               — list all datasets (Reviewer / Admin)
-  POST   /api/datasets/upload         — upload file(s) → S3 (Researcher)
-  GET    /api/datasets/<id>           — get dataset metadata
-  GET    /api/datasets/<id>/download/<filename> — pre-signed download URL
-  DELETE /api/datasets/<id>           — delete dataset (Admin or owner)
+  GET    /api/datasets/                 list all datasets (Reviewer / Admin)
+  POST   /api/datasets/upload           upload file(s) -> S3 (Researcher)
+  GET    /api/datasets/<id>             get dataset metadata
+  GET    /api/datasets/<id>/download/<filename>   pre-signed download URL
+  DELETE /api/datasets/<id>             delete dataset (Admin or owner)
 
 Security: all routes @jwt_required, role checked per operation.
 Caching:  dataset list cached in Redis for 5 min.
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 datasets_bp = Blueprint('datasets', __name__)
 
 
-# ── Helpers ─────────────────────────────────────────────────
+# -- Helpers ------------------------------------------------ 
 
 def _sign_data(data_bytes: bytes, private_key_pem: bytes) -> str:
     from cryptography.hazmat.primitives.asymmetric import padding
@@ -63,7 +63,7 @@ def _verify_signature(data_bytes: bytes, sig_b64: str, pub_key_pem: bytes) -> bo
         return False
 
 
-# ── Routes ──────────────────────────────────────────────────
+# -- Routes --------------------------------------------------
 
 @datasets_bp.route('/', methods=['GET'])
 @jwt_required
@@ -132,7 +132,7 @@ def upload():
     try:
         ensure_bucket_exists()
     except Exception as e:
-        logger.warning(f"[UPLOAD] Bucket check failed: {e} — continuing without S3")
+        logger.warning(f"[UPLOAD] Bucket check failed: {e}   continuing without S3")
 
     description = request.form.get('description', '').strip()
     if not description:
@@ -205,7 +205,7 @@ def upload():
 
     logs().insert_one({
         'user':   g.current_user,
-        'action': f'Uploaded {len(uploaded)} file(s) → dataset {dataset_id}',
+        'action': f'Uploaded {len(uploaded)} file(s) -> dataset {dataset_id}',
         'time':   str(datetime.datetime.now()),
     })
 
@@ -226,7 +226,7 @@ def upload():
 @jwt_required
 @role_required(['Reviewer', 'Admin', 'Researcher'])
 def get_dataset(dataset_id):
-    """GET /api/datasets/<id> — get dataset metadata."""
+    """GET /api/datasets/<id>   get dataset metadata."""
     try:
         oid = ObjectId(dataset_id)
     except Exception:

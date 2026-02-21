@@ -1,5 +1,5 @@
 """
-core/s3_storage.py — Cloud File Storage (S3 / MinIO)
+core/s3_storage.py   Cloud File Storage (S3 / MinIO)
 ======================================================
 Abstracts file storage behind a simple interface.
 Set STORAGE_BACKEND=minio (local dev) or STORAGE_BACKEND=s3 (AWS).
@@ -8,10 +8,10 @@ MinIO runs locally via docker-compose on port 9000.
 AWS S3 uses real credentials from .env.
 
 Key operations:
-  - upload_file()            → store encrypted bytes
-  - generate_presigned_url() → time-limited download link
-  - delete_file()            → remove from bucket
-  - ensure_bucket_exists()   → idempotent bucket creation
+  - upload_file()            -> store encrypted bytes
+  - generate_presigned_url() -> time-limited download link
+  - delete_file()            -> remove from bucket
+  - ensure_bucket_exists()   -> idempotent bucket creation
 """
 
 import logging
@@ -89,7 +89,7 @@ def upload_file(
             Body=file_bytes,
             **extra_args,
         )
-        logger.info(f"[S3] Uploaded → {bucket}/{s3_key} ({len(file_bytes)} bytes)")
+        logger.info(f"[S3] Uploaded -> {bucket}/{s3_key} ({len(file_bytes)} bytes)")
         return s3_key
     except ClientError as e:
         logger.error(f"[S3] Upload failed: {e}")

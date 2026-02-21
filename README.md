@@ -1,6 +1,6 @@
-# 🚀 Secure Research Dataset Sharing System with Time-Limited Access
+# [START] Secure Research Dataset Sharing System with Time-Limited Access
 
-## 📌 Project Description
+##   Project Description
 
 The **Secure Research Dataset Sharing System** is a web-based platform designed to securely share sensitive research datasets with controlled and time-limited access. The system ensures data confidentiality, integrity, and authorized usage through strong authentication, hybrid encryption techniques, and role-based access control.
 
@@ -10,7 +10,7 @@ This platform is ideal for academic institutions, research organizations, and se
 
 ---
 
-## ⚙️ Tech Stack
+##    Tech Stack
 
 * Python
 * Flask
@@ -24,53 +24,53 @@ This platform is ideal for academic institutions, research organizations, and se
 
 ---
 
-## ⭐ Features
+##   Features
 
-### 🔐 Secure Authentication
+### [CRYPTO] Secure Authentication
 
 * User login with password and email OTP verification
 * Multi-layer authentication for enhanced security
 
-### 👥 Role-Based Access Control
+###   Role-Based Access Control
 
-* Admin → manages users and datasets
-* Researcher → uploads and shares datasets
-* Reviewer → accesses shared datasets
+* Admin -> manages users and datasets
+* Researcher -> uploads and shares datasets
+* Reviewer -> accesses shared datasets
 
-### 🔒 Hybrid Encryption Security
+###   Hybrid Encryption Security
 
 * AES encryption for securing dataset files
 * RSA encryption for secure key exchange
 * End-to-end data protection
 
-### 🛡 Password Protection
+###   Password Protection
 
 * SHA-256 hashing with salt
 * Prevents password theft and unauthorized access
 
-### ✍️ Digital Signature Verification
+###    Digital Signature Verification
 
 * Ensures dataset authenticity and integrity
 * Prevents tampering or unauthorized modification
 
-### ⏳ Time-Limited Dataset Access
+###   Time-Limited Dataset Access
 
 * Datasets accessible only within defined validity period
 * Automatic access expiration
 
-### 🔗 API Integration
+###   API Integration
 
 * Backend APIs connected to frontend
 * Secure dataset upload and sharing functionality
 
-### 📊 Secure Dataset Management
+###   Secure Dataset Management
 
 * Upload, store, and manage research datasets
 * Controlled access permissions
 
 ---
 
-## 📸 Screenshot
+##   Screenshot
 
 ![Project Screenshot](p1-project.png)
 ![Project Screenshot](p2-project.png)
@@ -81,7 +81,7 @@ This platform is ideal for academic institutions, research organizations, and se
 
 ---
 
-## ▶️ How to Run the Project
+##    How to Run the Project
 
 1. Install Python and required dependencies
 2. Install packages:
@@ -93,6 +93,6 @@ This platform is ideal for academic institutions, research organizations, and se
 
 ---
 
-## 👨‍💻 Author
+##     Author
 
 **Hemanth Gudi**

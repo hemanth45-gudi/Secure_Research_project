@@ -1,5 +1,5 @@
 /**
- * auth.js — Client-side JWT Helper
+ * auth.js   Client-side JWT Helper
  * ==================================
  * Provides:
  *   saveTokens(access, refresh)  - Store both tokens in localStorage
@@ -16,7 +16,7 @@ const TOKEN_KEYS = {
   refresh: 'srp_refresh_token',
 };
 
-// ─── Storage ───────────────────────────────────────────────
+// --  Storage ---------------------------------------------- 
 export function saveTokens(accessToken, refreshToken) {
   localStorage.setItem(TOKEN_KEYS.access,  accessToken);
   localStorage.setItem(TOKEN_KEYS.refresh, refreshToken);
@@ -35,12 +35,12 @@ export function clearTokens() {
   localStorage.removeItem(TOKEN_KEYS.refresh);
 }
 
-// ─── Authenticated Fetch (auto refresh on 401) ─────────────
+// --  Authenticated Fetch (auto refresh on 401) ------------ 
 /**
  * Drop-in replacement for fetch() that automatically:
  *  1. Attaches Authorization: Bearer <access_token>
- *  2. On 401 TOKEN_EXPIRED → silently refreshes and retries once
- *  3. On second 401 → clears tokens and redirects to /login
+ *  2. On 401 TOKEN_EXPIRED -> silently refreshes and retries once
+ *  3. On second 401 -> clears tokens and redirects to /login
  */
 export async function authFetch(url, options = {}) {
   options.headers = options.headers || {};
@@ -68,7 +68,7 @@ export async function authFetch(url, options = {}) {
   return response;
 }
 
-// ─── Internal: Refresh Access Token ────────────────────────
+// --  Internal: Refresh Access Token ------------------------
 async function _refreshAccessToken() {
   const refreshToken = getRefreshToken();
   if (!refreshToken) return false;
@@ -93,7 +93,7 @@ async function _refreshAccessToken() {
   }
 }
 
-// ─── Login ─────────────────────────────────────────────────
+// --  Login ------------------------------------------------ 
 /**
  * Calls POST /api/login, stores tokens, redirects to /dashboard.
  * Returns { success, error } for caller to show UI feedback.
@@ -120,7 +120,7 @@ export async function loginWithCredentials(username, password) {
   }
 }
 
-// ─── Logout ────────────────────────────────────────────────
+// --  Logout ------------------------------------------------
 /**
  * Revokes refresh token on server and clears local storage.
  */
@@ -132,7 +132,7 @@ export async function logout() {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ refresh_token: refreshToken }),
-    }).catch(() => {});  // Best-effort — always clear locally
+    }).catch(() => {});  // Best-effort   always clear locally
   }
 
   clearTokens();

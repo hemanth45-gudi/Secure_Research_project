@@ -1,5 +1,5 @@
 """
-core/cache.py — Redis-Backed Caching
+core/cache.py   Redis-Backed Caching
 ======================================
 Flask-Caching singleton.
   - Dev:  SimpleCache (no Redis required)
@@ -8,11 +8,11 @@ Flask-Caching singleton.
 
 from flask_caching import Cache
 
-# Singleton — init_app() called from create_app()
+# Singleton   init_app() called from create_app()
 cache = Cache()
 
 
-# ── Helper wrappers ──────────────────────────────────────────
+# -- Helper wrappers ------------------------------------------
 
 def cache_user(username: str, data: dict, timeout: int = 300):
     """Cache user profile (role, email) to avoid repeated DB hits."""

@@ -1,12 +1,12 @@
 """
-api/admin_bp.py — Admin-Only API Blueprint
+api/admin_bp.py   Admin-Only API Blueprint
 ===========================================
 Mounted at: /api/admin/
 
 Endpoints:
-  GET /api/admin/logs        — paginated audit log (Admin)
-  GET /api/admin/stats       — system statistics (Admin)
-  DELETE /api/admin/logs     — clear audit logs (Admin)
+  GET /api/admin/logs          paginated audit log (Admin)
+  GET /api/admin/stats         system statistics (Admin)
+  DELETE /api/admin/logs       clear audit logs (Admin)
 """
 
 import datetime
@@ -61,7 +61,7 @@ def get_logs():
 @jwt_required
 @role_required(['Admin'])
 def clear_logs():
-    """DELETE /api/admin/logs — clear all audit logs."""
+    """DELETE /api/admin/logs   clear all audit logs."""
     result = logs().delete_many({})
     logs().insert_one({
         'user':   g.current_user,
@@ -75,7 +75,7 @@ def clear_logs():
 @jwt_required
 @role_required(['Admin'])
 def stats():
-    """GET /api/admin/stats — system overview statistics."""
+    """GET /api/admin/stats   system overview statistics."""
     now = datetime.datetime.now()
 
     total_users    = users().count_documents({})

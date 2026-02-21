@@ -1,15 +1,15 @@
 """
-api/auth_bp.py — Authentication REST API Blueprint
+api/auth_bp.py   Authentication REST API Blueprint
 ====================================================
 Mounted at: /api/auth/
 
 Endpoints:
-  POST /api/auth/login      — credential check → tokens + cookie
-  POST /api/auth/logout     — revoke refresh token + clear cookie
-  POST /api/auth/refresh    — exchange refresh token → new access token
-  POST /api/auth/register   — register new user (triggers OTP via email)
-  POST /api/auth/verify     — verify OTP → complete registration
-  GET  /api/auth/me         — current user info (jwt_required)
+  POST /api/auth/login        credential check -> tokens + cookie
+  POST /api/auth/logout       revoke refresh token + clear cookie
+  POST /api/auth/refresh      exchange refresh token -> new access token
+  POST /api/auth/register     register new user (triggers OTP via email)
+  POST /api/auth/verify       verify OTP -> complete registration
+  GET  /api/auth/me           current user info (jwt_required)
 
 Security:
   - Rate limited: 5/min on login, 3/min on register
@@ -36,11 +36,12 @@ from core.db       import users, refresh_tokens, logs, login_attempts
 from core.limiter  import limiter, record_failed_login, clear_failed_logins, is_account_locked
 from core.cache    import cache_user, get_cached_user, invalidate_user
 from core.validators import LoginSchema, RegisterSchema, RefreshTokenSchema, validate_json
+from core.email      import send_otp_email
 
 auth_bp = Blueprint('auth', __name__)
 
 
-# ── Helpers ─────────────────────────────────────────────────
+# -- Helpers ------------------------------------------------ 
 
 def _generate_salt() -> str:
     return base64.b64encode(os.urandom(16)).decode('utf-8')
@@ -66,25 +67,6 @@ def _generate_rsa_keys():
     return pem_priv, pem_pub
 
 
-def _send_otp_email(to_email: str, otp: str) -> bool:
-    email_addr = current_app.config.get('EMAIL_ADDRESS', '')
-    email_pass = current_app.config.get('EMAIL_PASSWORD', '')
-    try:
-        if not email_addr or not email_pass:
-            print(f"\n[WARN EMAIL] Not configured. OTP: {otp}\n", flush=True)
-            return True
-        msg = EmailMessage()
-        msg.set_content(f"Your Secure Research Portal OTP is: {otp}")
-        msg['Subject'] = 'Login Verification Code'
-        msg['From']    = email_addr
-        msg['To']      = to_email
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-            server.login(email_addr, email_pass)
-            server.send_message(msg)
-        return True
-    except Exception as e:
-        print(f"\n[ERROR EMAIL FAILED] {e} | OTP: {otp}\n", flush=True)
-        return True  # Return True so registration can proceed even if email fails
 
 
 def _make_token_response(access_token: str, refresh_token: str,
@@ -108,7 +90,7 @@ def _make_token_response(access_token: str, refresh_token: str,
     return resp, status
 
 
-# ── Routes ──────────────────────────────────────────────────
+# -- Routes --------------------------------------------------
 
 @auth_bp.route('/login', methods=['POST'])
 @limiter.limit("5 per minute")
@@ -220,7 +202,7 @@ def register():
     """
     POST /api/auth/register
     Body: { username, email, password, role, admin_key? }
-    Sends OTP to email — complete via POST /api/auth/verify
+    Sends OTP to email   complete via POST /api/auth/verify
     """
     data      = g.validated_data
     username  = data['username']
@@ -246,7 +228,7 @@ def register():
                               'password': password, 'role': role}
     session['otp']         = otp
 
-    _send_otp_email(email, otp)
+    send_otp_email(email, otp)
 
     return jsonify({
         'message': 'OTP sent to email. Verify at POST /api/auth/verify',
@@ -304,7 +286,7 @@ def verify():
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required
 def me():
-    """GET /api/auth/me — return current user profile."""
+    """GET /api/auth/me   return current user profile."""
     username = g.current_user
 
     cached = get_cached_user(username)

@@ -1,5 +1,5 @@
 """
-core/limiter.py — Rate Limiting & Brute-Force Protection
+core/limiter.py   Rate Limiting & Brute-Force Protection
 ==========================================================
 Uses Flask-Limiter with Redis storage (falls back to memory for dev).
 
@@ -15,14 +15,14 @@ from flask_limiter.util import get_remote_address
 
 logger = logging.getLogger(__name__)
 
-# Singleton limiter — init_app() called from create_app()
+# Singleton limiter   init_app() called from create_app()
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["200 per day", "50 per hour"],
 )
 
 
-# ── Brute-Force Account Lockout ─────────────────────────────────
+# -- Brute-Force Account Lockout -------------------------------- 
 
 def record_failed_login(username: str, ip: str):
     """

@@ -1,5 +1,5 @@
 """
-test_jwt.py — JWT Endpoint Verification
+test_jwt.py   JWT Endpoint Verification
 Tests both the JSON API behavior and the browser (cookie) auth behavior.
 """
 import requests
@@ -18,72 +18,72 @@ def chk(name, condition, detail=''):
         print(f'  [FAIL] {name} | {detail}')
         failed += 1
 
-print('\n=== Browser page-route tests (no token → expect 302 redirect to /login) ===')
+print('\n=== Browser page-route tests (no token -> expect 302 redirect to /login) ===')
 
-# Test 1: No token, browser navigation → server redirects to /login (302)
+# Test 1: No token, browser navigation -> server redirects to /login (302)
 try:
     r = requests.get(f'{BASE}/dashboard', allow_redirects=False, timeout=4)
-    chk('No-token /dashboard: browser nav → 302 redirect', r.status_code == 302, f'got {r.status_code}')
+    chk('No-token /dashboard: browser nav -> 302 redirect', r.status_code == 302, f'got {r.status_code}')
     chk('Redirect points to /login', '/login' in r.headers.get('Location', ''), r.headers.get('Location'))
 except Exception as e:
     chk('No-token /dashboard', False, str(e))
 
-# Test 2: No token, API client (sends Accept: application/json) → 401 JSON
+# Test 2: No token, API client (sends Accept: application/json) -> 401 JSON
 try:
     r = requests.get(f'{BASE}/dashboard',
                      headers={'Accept': 'application/json'},
                      allow_redirects=False, timeout=4)
     body = r.json()
-    chk('No-token API client /dashboard → 401 JSON', r.status_code == 401, f'got {r.status_code}')
+    chk('No-token API client /dashboard -> 401 JSON', r.status_code == 401, f'got {r.status_code}')
     chk('API client code=TOKEN_MISSING', body.get('code') == 'TOKEN_MISSING', str(body))
 except Exception as e:
     chk('No-token API client /dashboard', False, str(e))
 
 print('\n=== /api/login tests ===')
 
-# Test 3: Bad credentials → 401 JSON
+# Test 3: Bad credentials -> 401 JSON
 try:
     r = requests.post(f'{BASE}/api/login',
                       json={'username': 'nobody', 'password': 'wrong'}, timeout=4)
     body = r.json()
-    chk('Bad creds /api/login → 401', r.status_code == 401, f'got {r.status_code}')
+    chk('Bad creds /api/login -> 401', r.status_code == 401, f'got {r.status_code}')
     chk('Bad creds code=INVALID_CREDENTIALS', body.get('code') == 'INVALID_CREDENTIALS', str(body))
 except Exception as e:
     chk('Bad creds', False, str(e))
 
 print('\n=== Invalid Bearer token tests ===')
 
-# Test 4: Fake Bearer token → 401 TOKEN_INVALID
+# Test 4: Fake Bearer token -> 401 TOKEN_INVALID
 try:
     r = requests.get(f'{BASE}/dashboard',
                      headers={'Authorization': 'Bearer notarealtoken'}, timeout=4)
     body = r.json()
-    chk('Fake Bearer token → 401', r.status_code == 401, f'got {r.status_code}')
+    chk('Fake Bearer token -> 401', r.status_code == 401, f'got {r.status_code}')
     chk('Fake Bearer code=TOKEN_INVALID', body.get('code') == 'TOKEN_INVALID', str(body))
 except Exception as e:
     chk('Fake Bearer token', False, str(e))
 
-# Test 5: Role-protected route with no token: browser nav → 302
+# Test 5: Role-protected route with no token: browser nav -> 302
 try:
     r = requests.get(f'{BASE}/logs', allow_redirects=False, timeout=4)
-    chk('No-token /logs → 302 redirect', r.status_code == 302, f'got {r.status_code}')
+    chk('No-token /logs -> 302 redirect', r.status_code == 302, f'got {r.status_code}')
 except Exception as e:
     chk('No-token /logs', False, str(e))
 
 print('\n=== Refresh & Logout tests ===')
 
-# Test 6: Bad refresh token → 401
+# Test 6: Bad refresh token -> 401
 try:
     r = requests.post(f'{BASE}/api/token/refresh',
                       json={'refresh_token': 'badtoken'}, timeout=4)
-    chk('Bad refresh token → 401', r.status_code == 401, f'got {r.status_code}')
+    chk('Bad refresh token -> 401', r.status_code == 401, f'got {r.status_code}')
 except Exception as e:
     chk('Bad refresh token', False, str(e))
 
-# Test 7: Logout (no body) → 200 and cookie cleared
+# Test 7: Logout (no body) -> 200 and cookie cleared
 try:
     r = requests.post(f'{BASE}/api/logout', json={}, timeout=4)
-    chk('Logout → 200', r.status_code == 200, f'got {r.status_code}')
+    chk('Logout -> 200', r.status_code == 200, f'got {r.status_code}')
     # Check Set-Cookie clears the cookie
     cookie_header = r.headers.get('Set-Cookie', '')
     chk('Logout clears srp_access_token cookie', 'srp_access_token' in cookie_header, cookie_header)

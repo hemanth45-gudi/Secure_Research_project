@@ -1,22 +1,22 @@
 """
-auth.py — JWT Authentication Module
+auth.py   JWT Authentication Module
 ====================================
 Provides:
   - generate_tokens()       : Create access + refresh token pair
   - decode_access_token()   : Verify and decode access token
   - decode_refresh_token()  : Verify and decode refresh token
-  - jwt_required            : Route decorator — enforces valid access token
+  - jwt_required            : Route decorator   enforces valid access token
                               Reads from cookie (browser nav) OR Authorization header (API)
-  - role_required()         : Route decorator — enforces specific role(s)
+  - role_required()         : Route decorator   enforces specific role(s)
 
 TOKEN DELIVERY STRATEGY
 -----------------------
 Browser page navigations never send custom headers, so tokens stored only in
 localStorage would never reach Flask. The fix: set an HttpOnly cookie on login
 so the browser automatically delivers the JWT on every page request. API clients
-can still use the Authorization: Bearer header — jwt_required checks both.
+can still use the Authorization: Bearer header   jwt_required checks both.
 
-Priority: Authorization header → cookie
+Priority: Authorization header -> cookie
 """
 
 import os
@@ -27,7 +27,7 @@ from flask import request, jsonify, redirect, url_for, g
 
 
 # ============================================================
-# 🔑 JWT SECRETS & EXPIRY CONFIG
+#   JWT SECRETS & EXPIRY CONFIG
 # ============================================================
 JWT_ACCESS_SECRET  = os.environ.get('JWT_ACCESS_SECRET',  'access_super_secret_change_in_prod')
 JWT_REFRESH_SECRET = os.environ.get('JWT_REFRESH_SECRET', 'refresh_super_secret_change_in_prod')
@@ -40,7 +40,7 @@ ACCESS_TOKEN_COOKIE = 'srp_access_token'
 
 
 # ============================================================
-# 🏭 TOKEN GENERATION
+# [FACTORY] TOKEN GENERATION
 # ============================================================
 def generate_tokens(username: str, role: str) -> dict:
     """
@@ -75,7 +75,7 @@ def generate_tokens(username: str, role: str) -> dict:
 
 
 # ============================================================
-# 🔓 TOKEN DECODING / VALIDATION
+#   TOKEN DECODING / VALIDATION
 # ============================================================
 def decode_access_token(token: str) -> dict:
     """
@@ -102,21 +102,21 @@ def decode_refresh_token(token: str) -> dict:
 def _extract_token_from_request() -> str | None:
     """
     Extract access token from the request.
-    Priority: Authorization: Bearer header → HttpOnly cookie
+    Priority: Authorization: Bearer header -> HttpOnly cookie
 
     Returns the raw token string, or None if not found.
     """
-    # 1️⃣  Check Authorization header (API clients, fetch() calls)
+    # 1    Check Authorization header (API clients, fetch() calls)
     auth_header = request.headers.get('Authorization', '')
     if auth_header.startswith('Bearer '):
         return auth_header.split(' ', 1)[1].strip()
 
-    # 2️⃣  Fall back to HttpOnly cookie (browser page navigations)
+    # 2    Fall back to HttpOnly cookie (browser page navigations)
     return request.cookies.get(ACCESS_TOKEN_COOKIE)
 
 
 # ============================================================
-# 🛡️  MIDDLEWARE DECORATORS
+#     MIDDLEWARE DECORATORS
 # ============================================================
 def jwt_required(f):
     """
@@ -127,12 +127,12 @@ def jwt_required(f):
       2. Cookie srp_access_token         (browser page navigations)
 
     On success, sets:
-        flask.g.current_user  → username (str)
-        flask.g.current_role  → role     (str)
+        flask.g.current_user  -> username (str)
+        flask.g.current_role  -> role     (str)
 
     On failure:
-      - JSON response (API)    → 401
-      - Page route (HTML)      → redirect to /login
+      - JSON response (API)    -> 401
+      - Page route (HTML)      -> redirect to /login
     """
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -202,7 +202,7 @@ def role_required(required_roles: list):
                     }), 403
                 # For browser requests, show a simple access-denied message
                 from flask import flash
-                flash(f'⛔ ACCESS DENIED. Required role: {", ".join(required_roles)}', 'danger')
+                flash(f'  ACCESS DENIED. Required role: {", ".join(required_roles)}', 'danger')
                 return redirect(url_for('dashboard'))
             return f(*args, **kwargs)
         return decorated

@@ -1,5 +1,5 @@
 """
-core/validators.py — Input Validation with Marshmallow
+core/validators.py   Input Validation with Marshmallow
 ========================================================
 Defines schemas for all API request bodies.
 The @validate_json(Schema) decorator validates the request
@@ -11,7 +11,7 @@ from marshmallow import Schema, fields, validate, ValidationError, validates
 from flask import request, jsonify, g
 
 
-# ── Schemas ─────────────────────────────────────────────────
+# -- Schemas ------------------------------------------------ 
 
 class LoginSchema(Schema):
     username = fields.Str(
@@ -61,7 +61,7 @@ class UserDeleteSchema(Schema):
     username = fields.Str(required=True)
 
 
-# ── Decorator ────────────────────────────────────────────────
+# -- Decorator ------------------------------------------------
 
 def validate_json(schema_class):
     """

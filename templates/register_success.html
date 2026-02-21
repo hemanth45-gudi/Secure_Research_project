@@ -38,12 +38,12 @@
 <body>
 
     <div class="card">
-        <h1>🎉 Welcome, {{ username }}!</h1>
+        <h1>  Welcome, {{ username }}!</h1>
         <p>Your account has been created successfully.</p>
         
         {% if role == 'Researcher' %}
         <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 20px;">
-            <strong>⚠️ IMPORTANT:</strong> As a Researcher, you must download your 
+            <strong>[WARN] IMPORTANT:</strong> As a Researcher, you must download your 
             <strong>Private Key</strong> now. You may need to share this securely to prove your identity or sign datasets.
         </div>
         {% endif %}
@@ -51,7 +51,7 @@
         <textarea id="keyContent" style="display:none;">{{ private_key }}</textarea>
 
         <button onclick="downloadKey()" class="btn btn-download">
-            📥 Download Private Key
+              Download Private Key
         </button>
         
         <br>

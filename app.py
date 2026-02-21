@@ -1,5 +1,5 @@
 """
-app.py — Flask Application Factory
+app.py   Flask Application Factory
 ====================================
 create_app(env) bootstraps the Flask app:
   1. Loads config from config.py
@@ -38,6 +38,7 @@ from auth import generate_tokens, decode_access_token, decode_refresh_token, jwt
 from config import config_map
 from core.limiter import limiter
 from core.cache   import cache
+from core.email   import send_otp_email
 from core.db      import init_db, users as users_col_fn, datasets as datasets_col_fn
 from core.db      import logs as logs_col_fn, refresh_tokens as rt_col_fn
 
@@ -54,25 +55,25 @@ def create_app(env: str = None) -> Flask:
     cfg = config_map.get(env, config_map['default'])
     app.config.from_object(cfg)
 
-    # ── Extensions ──────────────────────────────────────────
+    # -- Extensions ------------------------------------------
     try:
         limiter.init_app(app)
     except Exception as e:
-        print(f"[⚠️ LIMITER] Init warning: {e}", flush=True)
+        print(f"[[WARN] LIMITER] Init warning: {e}", flush=True)
 
     cache.init_app(app)
 
-    # ── MongoDB ─────────────────────────────────────────────
+    # -- MongoDB -------------------------------------------- 
     init_db(app)
 
-    # ── CORS (allow API clients) ─────────────────────────────
+    # -- CORS (allow API clients) ---------------------------- 
     try:
         from flask_cors import CORS
         CORS(app, resources={r"/api/*": {"origins": "*"}})
     except ImportError:
         pass
 
-    # ── API Blueprints ───────────────────────────────────────
+    # -- API Blueprints -------------------------------------- 
     from api.auth_bp     import auth_bp
     from api.datasets_bp import datasets_bp
     from api.users_bp    import users_bp
@@ -83,10 +84,10 @@ def create_app(env: str = None) -> Flask:
     app.register_blueprint(users_bp,    url_prefix='/api/users')
     app.register_blueprint(admin_bp,    url_prefix='/api/admin')
 
-    # ── Page Routes (backward-compatible browser UI) ─────────
+    # -- Page Routes (backward-compatible browser UI) -------- 
     _register_page_routes(app)
 
-    print(f"\n[✅ APP] Started in '{env}' mode on port 5000\n", flush=True)
+    print(f"\n[[OK] APP] Started in '{env}' mode on port 5000\n", flush=True)
     return app
 
 
@@ -141,24 +142,6 @@ def _verify_signature(data_bytes, signature_b64, public_key_pem):
         return False
 
 
-def _send_email_otp(to_email, otp, email_address, email_password):
-    try:
-        if not email_address or not email_password:
-            print(f"\n[⚠️ SIMULATION] OTP: {otp}\n", flush=True)
-            return True
-        msg = EmailMessage()
-        msg.set_content(f"Your Secure Research Portal OTP is: {otp}")
-        msg['Subject'] = 'Login Verification Code'
-        msg['From']    = email_address
-        msg['To']      = to_email
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-            server.login(email_address, email_password)
-            server.send_message(msg)
-        print(f"\n[EMAIL] OTP sent to {to_email}\n", flush=True)
-        return True
-    except Exception as e:
-        print(f"\n[EMAIL] {e} | OTP: {otp}\n", flush=True)
-        return True  # Continue even if email fails
 
 
 # ============================================================
@@ -170,12 +153,12 @@ def _register_page_routes(app: Flask):
 
     from flask import current_app
 
-    # ── Home ──────────────────────────────────────────────
+    # -- Home ----------------------------------------------
     @app.route('/')
     def home():
         return render_template('home.html')
 
-    # ── Register ──────────────────────────────────────────
+    # -- Register ------------------------------------------
     @app.route('/register', methods=['GET', 'POST'])
     def register():
         if request.method == 'POST':
@@ -187,7 +170,7 @@ def _register_page_routes(app: Flask):
 
             email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             if not re.match(email_regex, email):
-                flash('⚠️ Invalid Email Address!', 'danger')
+                flash('[WARN] Invalid Email Address!', 'danger')
                 return redirect(url_for('register'))
 
             if len(password) < 8:
@@ -201,7 +184,7 @@ def _register_page_routes(app: Flask):
             if role == 'Admin':
                 expected = current_app.config.get('ADMIN_REGISTRATION_KEY', 'AdminSecret123!')
                 if admin_key_input != expected:
-                    flash('⛔ Invalid Admin Registration Key.', 'danger')
+                    flash('  Invalid Admin Registration Key.', 'danger')
                     return redirect(url_for('register'))
 
             otp = str(random.randint(100000, 999999))
@@ -210,17 +193,13 @@ def _register_page_routes(app: Flask):
                 'password': password, 'role': role,
             }
             session['otp'] = otp
-            _send_email_otp(
-                email, otp,
-                current_app.config.get('EMAIL_ADDRESS', ''),
-                current_app.config.get('EMAIL_PASSWORD', ''),
-            )
-            flash('✅ Verification Code Sent! Check your email.', 'info')
+            send_otp_email(email, otp)
+            flash('[OK] Verification Code Sent! Check your email.', 'info')
             return redirect(url_for('verify_email'))
 
         return render_template('register.html')
 
-    # ── Verify Email (OTP) ────────────────────────────────
+    # -- Verify Email (OTP) --------------------------------
     @app.route('/verify_email', methods=['GET', 'POST'])
     def verify_email():
         if 'pending_reg' not in session or 'otp' not in session:
@@ -260,11 +239,11 @@ def _register_page_routes(app: Flask):
                                        role=data['role'],
                                        private_key=priv_key.decode('utf-8'))
             else:
-                flash('❌ Invalid OTP. Please try again.', 'danger')
+                flash('[ERROR] Invalid OTP. Please try again.', 'danger')
 
         return render_template('verify_email.html')
 
-    # ── Login (session bridge + JWT) ─────────────────────
+    # -- Login (session bridge + JWT) -------------------- 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
         if request.method == 'POST':
@@ -286,14 +265,14 @@ def _register_page_routes(app: Flask):
 
         return render_template('login.html')
 
-    # ── Dashboard ─────────────────────────────────────────
+    # -- Dashboard ---------------------------------------- 
     @app.route('/dashboard')
     @jwt_required
     def dashboard():
         return render_template('dashboard.html',
                                user=g.current_user, role=g.current_role)
 
-    # ── Upload (Researcher) ───────────────────────────────
+    # -- Upload (Researcher) ------------------------------ 
     @app.route('/upload', methods=['GET', 'POST'])
     @jwt_required
     @role_required(['Researcher'])
@@ -357,7 +336,7 @@ def _register_page_routes(app: Flask):
 
         return render_template('upload.html')
 
-    # ── View Datasets (Reviewer) ──────────────────────────
+    # -- View Datasets (Reviewer) --------------------------
     @app.route('/view_datasets')
     @jwt_required
     @role_required(['Reviewer'])
@@ -398,7 +377,7 @@ def _register_page_routes(app: Flask):
         })
         return render_template('view_datasets.html', data=data)
 
-    # ── View Logs (Admin) ─────────────────────────────────
+    # -- View Logs (Admin) -------------------------------- 
     @app.route('/logs')
     @jwt_required
     @role_required(['Admin'])
@@ -406,7 +385,7 @@ def _register_page_routes(app: Flask):
         all_logs = list(logs_col_fn().find())
         return render_template('view_logs.html', logs=all_logs)
 
-    # ── Manage Users (Admin) ──────────────────────────────
+    # -- Manage Users (Admin) ------------------------------
     @app.route('/manage_users')
     @jwt_required
     @role_required(['Admin'])
@@ -414,7 +393,7 @@ def _register_page_routes(app: Flask):
         all_users = {u['username']: u for u in users_col_fn().find()}
         return render_template('manage_users.html', users=all_users)
 
-    # ── Delete User (Admin) ───────────────────────────────
+    # -- Delete User (Admin) ------------------------------ 
     @app.route('/delete_user/<username>')
     @jwt_required
     @role_required(['Admin'])
@@ -431,7 +410,7 @@ def _register_page_routes(app: Flask):
             flash(f'User {username} not found.', 'danger')
         return redirect(url_for('manage_users'))
 
-    # ── Logout ────────────────────────────────────────────
+    # -- Logout --------------------------------------------
     @app.route('/logout')
     def logout():
         session.clear()
@@ -439,7 +418,7 @@ def _register_page_routes(app: Flask):
         resp.delete_cookie('srp_access_token', path='/')
         return resp
 
-    # ── Health Check ──────────────────────────────────────
+    # -- Health Check --------------------------------------
     @app.route('/health')
     def health():
         from core.db import get_db

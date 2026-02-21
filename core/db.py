@@ -1,5 +1,5 @@
 """
-core/db.py — MongoDB Connection Manager
+core/db.py   MongoDB Connection Manager
 =========================================
 Provides a module-level singleton connection pool.
 Call init_db(app) once during app creation, then
@@ -38,7 +38,7 @@ def get_db():
 
 
 def get_collection(name: str):
-    """Shorthand: get_collection('users') → db['users']"""
+    """Shorthand: get_collection('users') -> db['users']"""
     return get_db()[name]
 
 

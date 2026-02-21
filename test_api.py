@@ -1,5 +1,5 @@
 """
-test_api.py — Comprehensive Production API Tests
+test_api.py   Comprehensive Production API Tests
 ==================================================
 Tests all new REST API endpoints + verifies existing routes are intact.
 Run:   python test_api.py
@@ -31,7 +31,7 @@ def section(title):
     print('='*60)
 
 
-# ── Start app in background thread ─────────────────────────
+# -- Start app in background thread ------------------------ 
 def start_server():
     from app import create_app
     _app = create_app('development')
@@ -65,16 +65,16 @@ section('Input Validation')
 
 # Empty body
 r = requests.post(f'{BASE}/api/auth/login', json={}, timeout=4)
-chk('Empty body → 422', r.status_code == 422, f'got {r.status_code}')
+chk('Empty body -> 422', r.status_code == 422, f'got {r.status_code}')
 
 # Short password
 r = requests.post(f'{BASE}/api/auth/login', json={'username': 'a', 'password': 'short'}, timeout=4)
-chk('Short password → 422', r.status_code == 422, f'got {r.status_code}')
+chk('Short password -> 422', r.status_code == 422, f'got {r.status_code}')
 
 # Missing field
 r = requests.post(f'{BASE}/api/auth/login', json={'username': 'only'}, timeout=4)
 body = r.json()
-chk('Missing password → 422', r.status_code == 422, f'got {r.status_code}')
+chk('Missing password -> 422', r.status_code == 422, f'got {r.status_code}')
 chk('Validation code=VALIDATION_ERROR', body.get('code') == 'VALIDATION_ERROR', str(body))
 
 
@@ -86,28 +86,29 @@ section('Authentication API (/api/auth/)')
 # Bad credentials
 r = requests.post(f'{BASE}/api/auth/login',
                   json={'username': 'nobody_xyz', 'password': 'WrongPass1'}, timeout=4)
-chk('Bad credentials → 401', r.status_code == 401, f'got {r.status_code}')
+chk('Bad credentials -> 401', r.status_code == 401, f'got {r.status_code}')
 chk('code=INVALID_CREDENTIALS', r.json().get('code') == 'INVALID_CREDENTIALS', str(r.json()))
 
 # Invalid Bearer token on protected endpoint
 r = requests.get(f'{BASE}/api/auth/me',
                  headers={'Authorization': 'Bearer totallyfaketoken'}, timeout=4)
-chk('Fake Bearer → 401', r.status_code == 401, f'got {r.status_code}')
+chk('Fake Bearer -> 401', r.status_code == 401, f'got {r.status_code}')
 code = r.json().get('code', '')
 chk('code=TOKEN_INVALID', 'TOKEN_INVALID' in code or 'INVALID' in code, code)
 
 # No token
-r = requests.get(f'{BASE}/api/auth/me', timeout=4)
-chk('No token /api/auth/me → 401', r.status_code == 401, f'got {r.status_code}')
+r = requests.get(f'{BASE}/api/auth/me',
+                 headers={'Accept': 'application/json'}, timeout=4)
+chk('No token /api/auth/me -> 401', r.status_code == 401, f'got {r.status_code}')
 
 # Bad refresh token
 r = requests.post(f'{BASE}/api/auth/refresh',
                   json={'refresh_token': 'badtoken'}, timeout=4)
-chk('Bad refresh token → 401', r.status_code == 401, f'got {r.status_code}')
+chk('Bad refresh token -> 401', r.status_code == 401, f'got {r.status_code}')
 
-# Logout (no body) → always 200
+# Logout (no body) -> always 200
 r = requests.post(f'{BASE}/api/auth/logout', json={}, timeout=4)
-chk('Logout (no body) → 200', r.status_code == 200, f'got {r.status_code}')
+chk('Logout (no body) -> 200', r.status_code == 200, f'got {r.status_code}')
 chk('Logout clears cookie', 'srp_access_token' in r.headers.get('Set-Cookie', ''),
     r.headers.get('Set-Cookie', ''))
 
@@ -121,12 +122,12 @@ section('Route Protection & RBAC')
 for path in ['/api/datasets/', '/api/users/', '/api/admin/logs', '/api/admin/stats']:
     r = requests.get(f'{BASE}{path}',
                      headers={'Accept': 'application/json'}, timeout=4)
-    chk(f'{path} → 401 without token', r.status_code == 401, f'got {r.status_code}')
+    chk(f'{path} -> 401 without token', r.status_code == 401, f'got {r.status_code}')
 
-# Browser page routes without token → 302 redirect
+# Browser page routes without token -> 302 redirect
 for path in ['/dashboard', '/logs', '/manage_users', '/view_datasets', '/upload']:
     r = requests.get(f'{BASE}{path}', allow_redirects=False, timeout=4)
-    chk(f'{path} → 302 redirect', r.status_code in (302, 308), f'got {r.status_code}')
+    chk(f'{path} -> 302 redirect', r.status_code in (302, 308), f'got {r.status_code}')
 
 
 # ==============================================================

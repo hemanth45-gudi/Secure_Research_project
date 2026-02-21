@@ -1,13 +1,13 @@
 """
-api/users_bp.py — User Management API Blueprint
+api/users_bp.py   User Management API Blueprint
 =================================================
 Mounted at: /api/users/
 
 Endpoints:
-  GET    /api/users/           — list all users (Admin only)
-  GET    /api/users/me         — current user's profile (any authenticated)
-  DELETE /api/users/<username> — delete user + their datasets (Admin only)
-  PATCH  /api/users/<username>/role — change user role (Admin only)
+  GET    /api/users/             list all users (Admin only)
+  GET    /api/users/me           current user's profile (any authenticated)
+  DELETE /api/users/<username>   delete user + their datasets (Admin only)
+  PATCH  /api/users/<username>/role   change user role (Admin only)
 """
 
 import datetime
@@ -24,7 +24,7 @@ users_bp = Blueprint('users', __name__)
 @jwt_required
 @role_required(['Admin'])
 def list_users():
-    """GET /api/users/ — list all users (without password hashes)."""
+    """GET /api/users/   list all users (without password hashes)."""
     all_users = list(
         users().find({}, {'hash': 0, 'salt': 0, 'public_key': 0})
     )
@@ -39,7 +39,7 @@ def list_users():
 @users_bp.route('/me', methods=['GET'])
 @jwt_required
 def me():
-    """GET /api/users/me — current user profile (cached)."""
+    """GET /api/users/me   current user profile (cached)."""
     username = g.current_user
 
     cached = get_cached_user(username)

@@ -11,13 +11,13 @@
   <script>
     /**
      * Global JWT Helper (layout.html)
-     * ─────────────────────────────────────────────────────────
+     * -------------------------------------------------------- 
      * HOW AUTH WORKS:
-     *   • On login, the server sets an HttpOnly cookie `srp_access_token`.
-     *   • Every browser page navigation automatically sends this cookie —
+     *     On login, the server sets an HttpOnly cookie `srp_access_token`.
+     *     Every browser page navigation automatically sends this cookie  
      *     Flask's jwt_required reads it, no JS needed for page loads.
-     *   • localStorage holds tokens for JS-based fetch() calls only.
-     *   • Server-side 401 on protected routes → Flask redirects to /login.
+     *     localStorage holds tokens for JS-based fetch() calls only.
+     *     Server-side 401 on protected routes -> Flask redirects to /login.
      *
      * This script:
      *   1. Patches window.fetch to auto-attach Authorization header (for AJAX).
@@ -74,7 +74,7 @@
         return resp;
       };
 
-      // Global logout — clears HttpOnly cookie (server) + localStorage
+      // Global logout   clears HttpOnly cookie (server) + localStorage
       window.jwtLogout = async function () {
         const rt = localStorage.getItem('srp_refresh_token');
         await _originalFetch('/api/logout', {
@@ -91,7 +91,7 @@
 
 <body>
   <div class="container">
-    <h2 class="text-center">🔒 Secure Research Dataset System</h2>
+    <h2 class="text-center">  Secure Research Dataset System</h2>
     <hr>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
