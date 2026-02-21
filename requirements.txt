@@ -1,2 +1,4 @@
 flask
 cryptography
+PyJWT
+pymongo

@@ -1,26 +1,77 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h2 class="text-center">🔒 Secure Research Dataset System</h2>
-        <hr>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
 
-        {% block content %}{% endblock %}
-    </div>
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <script>
+    /**
+     * Global JWT Token Injector
+     * ───────────────────────────────────────────────
+     * On every page load, check if a JWT access token exists in localStorage.
+     * If not on the login/register pages, redirect to /login.
+     * Also patches window.fetch to always send Authorization header.
+     */
+    (function () {
+      const PUBLIC_PATHS = ['/login', '/register', '/verify_email', '/', '/api/login'];
+      const isPublic = PUBLIC_PATHS.some(p => window.location.pathname === p || window.location.pathname.startsWith(p));
+
+      const token = localStorage.getItem('srp_access_token');
+
+      // Guard: redirect to login if no token and on a protected page
+      if (!isPublic && !token) {
+        window.location.href = '/login';
+      }
+
+      // Patch fetch to auto-inject Authorization header
+      const _originalFetch = window.fetch.bind(window);
+      window.fetch = function (url, options = {}) {
+        const t = localStorage.getItem('srp_access_token');
+        if (t && !String(url).includes('/api/token/refresh')) {
+          options.headers = options.headers || {};
+          if (!options.headers['Authorization']) {
+            options.headers['Authorization'] = 'Bearer ' + t;
+          }
+        }
+        return _originalFetch(url, options);
+      };
+
+      // Global logout helper available on all pages
+      window.jwtLogout = async function () {
+        const rt = localStorage.getItem('srp_refresh_token');
+        if (rt) {
+          await _originalFetch('/api/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: rt }),
+          }).catch(() => { });
+        }
+        localStorage.clear();
+        window.location.href = '/login';
+      };
+    })();
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <h2 class="text-center">🔒 Secure Research Dataset System</h2>
+    <hr>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
 </body>
+
 </html>

@@ -6,13 +6,22 @@ import random
 import smtplib 
 import re
 from email.message import EmailMessage
-from flask import Flask, request, render_template, redirect, url_for, session, flash
+from flask import Flask, request, render_template, redirect, url_for, session, flash, jsonify, g
 from functools import wraps
 from werkzeug.utils import secure_filename
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.fernet import Fernet 
 from pymongo import MongoClient
+
+# Import JWT auth module
+from auth import (
+    generate_tokens,
+    decode_access_token,
+    decode_refresh_token,
+    jwt_required,
+    role_required,
+)
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_lab_key' 
@@ -23,9 +32,10 @@ app.secret_key = 'super_secret_lab_key'
 try:
     client = MongoClient('mongodb://localhost:27017/')
     db = client['secure_research_db']
-    users_col = db['users']
-    datasets_col = db['datasets']
-    logs_col = db['logs']
+    users_col          = db['users']
+    datasets_col       = db['datasets']
+    logs_col           = db['logs']
+    refresh_tokens_col = db['refresh_tokens']   # ← JWT refresh token store
     print("\n[✅ MONGODB] Connected successfully!\n", flush=True)
 except Exception as e:
     print(f"\n[❌ MONGODB ERROR] {e}\n", flush=True)
@@ -91,19 +101,6 @@ def verify_signature(data_bytes, signature_b64, public_key_pem):
     except Exception: 
         return False
 
-def role_required(required_roles):
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            if 'user' not in session: 
-                return redirect(url_for('login'))
-            if session.get('role') not in required_roles:
-                flash("⛔ ACCESS DENIED.", "danger")
-                return redirect(url_for('dashboard'))
-            return f(*args, **kwargs)
-        return decorated_function
-    return decorator
-
 # ==========================================
 # 📧 EMAIL SENDING FUNCTION
 # ==========================================
@@ -132,7 +129,7 @@ def send_email_otp(to_email, otp):
         return False
 
 # ==========================================
-# 🚦 ROUTES
+# 🚦 PAGE ROUTES  (Session-based — kept for backward compat)
 # ==========================================
 @app.route('/')
 def home(): 
@@ -236,8 +233,7 @@ def verify_email():
 
 @app.route('/login', methods=['GET', 'POST'])
 
-
-#Single-Factor Authentication
+#Single-Factor Authentication (session-based — kept for template rendering)
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -257,12 +253,12 @@ def login():
     return render_template('login.html')
 
 @app.route('/dashboard')
+@jwt_required
 def dashboard():
-    if 'user' not in session: 
-        return redirect(url_for('login'))
-    return render_template('dashboard.html', user=session['user'], role=session['role'])
+    return render_template('dashboard.html', user=g.current_user, role=g.current_role)
 
 @app.route('/upload', methods=['GET', 'POST'])
+@jwt_required
 @role_required(['Researcher'])
 def upload_dataset():
     if request.method == 'POST':
@@ -316,18 +312,18 @@ def upload_dataset():
         
         if uploaded_files_data:
             new_dataset = {
-                'owner': session['user'], 
+                'owner': g.current_user, 
                 'description': desc, 
                 'files': uploaded_files_data, 
                 'upload_time': datetime.datetime.now()
             }
             datasets_col.insert_one(new_dataset)
             
-            logs_col.insert_one({'user': session['user'], 'action': f'Uploaded {len(uploaded_files_data)} files', 'time': str(datetime.datetime.now())})
+            logs_col.insert_one({'user': g.current_user, 'action': f'Uploaded {len(uploaded_files_data)} files', 'time': str(datetime.datetime.now())})
             
             # --- RECEIPT GENERATION ---
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-            receipt_str = f"{session['user']}_UPLOAD_REC_{timestamp}"
+            receipt_str = f"{g.current_user}_UPLOAD_REC_{timestamp}"
             receipt_b64 = base64.b64encode(receipt_str.encode('utf-8')).decode('utf-8')
             
             return render_template('upload_success_receipt.html', receipt=receipt_b64)
@@ -335,6 +331,7 @@ def upload_dataset():
     return render_template('upload.html')
 
 @app.route('/view_datasets')
+@jwt_required
 @role_required(['Reviewer'])
 def view_datasets():
     data = []
@@ -350,9 +347,6 @@ def view_datasets():
         public_key = owner_doc['public_key']
         # Convert to PEM strings if bytes
         if isinstance(public_key, bytes):
-            # In signature verification it expects bytes for key loading usually?
-            # verify_signature function: serialization.load_pem_public_key(public_key_pem) 
-            # If stored as bytes in Mongo, pass as is.
             pass
             
         for f in ds['files']:
@@ -375,34 +369,33 @@ def view_datasets():
                     continue
         
         if files: 
-             # Use '_id' for ID, convert to string
              data.append({'id': str(ds['_id']), 'owner': ds['owner'], 'description': ds['description'], 'files': files, 'status': 'active'})
             
-    logs_col.insert_one({'user': session['user'], 'action': 'Viewed Data', 'time': str(datetime.datetime.now())})
+    logs_col.insert_one({'user': g.current_user, 'action': 'Viewed Data', 'time': str(datetime.datetime.now())})
     return render_template('view_datasets.html', data=data)
 
 @app.route('/logs')
+@jwt_required
 @role_required(['Admin'])
 def view_logs(): 
-    # Get all logs, sort by time? We store time as string, so sort might be tricky unless ISO format.
-    # For now just list them.
     all_logs = list(logs_col.find())
     return render_template('view_logs.html', logs=all_logs)
 
 @app.route('/manage_users')
+@jwt_required
 @role_required(['Admin'])
 def manage_users():
-    # Convert cursor to dict/list for template
     all_users = {u['username']: u for u in users_col.find()}
     return render_template('manage_users.html', users=all_users)
 
 @app.route('/delete_user/<username>')
+@jwt_required
 @role_required(['Admin'])
 def delete_user(username):
     result = users_col.delete_one({'username': username})
     if result.deleted_count > 0:
         flash(f'User {username} deleted successfully.', 'success')
-        logs_col.insert_one({'user': session['user'], 'action': f'Deleted user {username}', 'time': str(datetime.datetime.now())})
+        logs_col.insert_one({'user': g.current_user, 'action': f'Deleted user {username}', 'time': str(datetime.datetime.now())})
     else:
         flash(f'User {username} not found.', 'danger')
     return redirect(url_for('manage_users'))
@@ -411,6 +404,117 @@ def delete_user(username):
 def logout(): 
     session.clear()
     return redirect(url_for('login'))
+
+
+# ==========================================
+# 🔐 JWT API ENDPOINTS
+# ==========================================
+
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    """
+    POST /api/login
+    Body: { "username": "...", "password": "..." }
+    Returns: { "access_token": "...", "refresh_token": "...", "role": "..." }
+    """
+    data = request.get_json(silent=True)
+    if not data or 'username' not in data or 'password' not in data:
+        return jsonify({'error': 'username and password are required', 'code': 'BAD_REQUEST'}), 400
+
+    username = data['username'].strip()
+    password = data['password']
+
+    user = users_col.find_one({'username': username})
+    if not user or user['hash'] != hash_password(password, user['salt']):
+        return jsonify({'error': 'Invalid username or password', 'code': 'INVALID_CREDENTIALS'}), 401
+
+    # Generate JWT pair
+    tokens = generate_tokens(username, user['role'])
+
+    # Persist refresh token in MongoDB (for revocation support)
+    refresh_tokens_col.insert_one({
+        'username':      username,
+        'refresh_token': tokens['refresh_token'],
+        'issued_at':     datetime.datetime.utcnow(),
+        'expires_at':    datetime.datetime.utcnow() + datetime.timedelta(days=7),
+    })
+
+    logs_col.insert_one({
+        'user':   username,
+        'action': 'JWT API Login',
+        'time':   str(datetime.datetime.now()),
+    })
+
+    return jsonify({
+        'access_token':  tokens['access_token'],
+        'refresh_token': tokens['refresh_token'],
+        'role':          user['role'],
+        'username':      username,
+    }), 200
+
+
+@app.route('/api/token/refresh', methods=['POST'])
+def api_token_refresh():
+    """
+    POST /api/token/refresh
+    Body: { "refresh_token": "..." }
+    Returns: { "access_token": "..." }
+    """
+    data = request.get_json(silent=True)
+    if not data or 'refresh_token' not in data:
+        return jsonify({'error': 'refresh_token is required', 'code': 'BAD_REQUEST'}), 400
+
+    refresh_token = data['refresh_token']
+
+    # Validate token signature & expiry
+    try:
+        payload = decode_refresh_token(refresh_token)
+    except Exception as e:
+        return jsonify({'error': f'Invalid or expired refresh token: {str(e)}', 'code': 'TOKEN_INVALID'}), 401
+
+    # Check token exists in DB (not revoked)
+    stored = refresh_tokens_col.find_one({'refresh_token': refresh_token})
+    if not stored:
+        return jsonify({'error': 'Refresh token has been revoked', 'code': 'TOKEN_REVOKED'}), 401
+
+    # Issue new access token only
+    import jwt as _jwt
+    from auth import JWT_ACCESS_SECRET, JWT_ACCESS_EXPIRY, JWT_ALGORITHM
+    now = datetime.datetime.utcnow()
+    new_access_payload = {
+        'sub':  payload['sub'],
+        'role': payload['role'],
+        'iat':  now,
+        'exp':  now + JWT_ACCESS_EXPIRY,
+        'type': 'access',
+    }
+    new_access_token = _jwt.encode(new_access_payload, JWT_ACCESS_SECRET, algorithm=JWT_ALGORITHM)
+
+    return jsonify({'access_token': new_access_token}), 200
+
+
+@app.route('/api/logout', methods=['POST'])
+def api_logout():
+    """
+    POST /api/logout
+    Body: { "refresh_token": "..." }
+    Revokes the refresh token from the database.
+    """
+    data = request.get_json(silent=True)
+    if not data or 'refresh_token' not in data:
+        return jsonify({'error': 'refresh_token is required', 'code': 'BAD_REQUEST'}), 400
+
+    refresh_token = data['refresh_token']
+
+    # Remove from DB — token is now revoked
+    result = refresh_tokens_col.delete_one({'refresh_token': refresh_token})
+
+    if result.deleted_count > 0:
+        return jsonify({'message': 'Logged out successfully'}), 200
+    else:
+        # Token wasn't in DB (already revoked or never issued) — still 200
+        return jsonify({'message': 'Token not found or already revoked'}), 200
+
 
 if __name__ == '__main__': 
     app.run(debug=True, port=5000)

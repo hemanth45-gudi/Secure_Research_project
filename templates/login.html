@@ -114,16 +114,70 @@
         <div class="icon-lock">🛡️</div>
         <h2 class="glass-title">Access Portal</h2>
 
-        <form method="post">
-            <input type="text" name="username" class="form-control" placeholder="USERNAME" required>
-            <input type="password" name="password" class="form-control" placeholder="PASSWORD" required>
+        <!-- JWT Login Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <input type="text"     id="username" name="username" class="form-control" placeholder="USERNAME" required>
+            <input type="password" id="password" name="password" class="form-control" placeholder="PASSWORD" required>
 
-            <button type="submit" class="btn-login">Authenticate</button>
+            <div id="loginError" style="
+                display:none; color:#c0392b; background:#fdecea;
+                border:1px solid #e74c3c; border-radius:6px;
+                padding:10px 14px; margin-bottom:14px; font-size:0.9rem; text-align:left;">
+            </div>
+
+            <button type="submit" id="loginBtn" class="btn-login">Authenticate</button>
         </form>
 
         <div class="mt-4">
             <a href="{{ url_for('register') }}" class="register-link">Create Secure Account</a>
         </div>
+
+        <script>
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            const btn      = document.getElementById('loginBtn');
+            const errBox   = document.getElementById('loginError');
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Reset UI
+            errBox.style.display = 'none';
+            btn.disabled    = true;
+            btn.textContent = 'Authenticating…';
+
+            try {
+                const res  = await fetch('/api/login', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ username, password }),
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.access_token) {
+                    // ✅ Store tokens in localStorage
+                    localStorage.setItem('srp_access_token',  data.access_token);
+                    localStorage.setItem('srp_refresh_token', data.refresh_token);
+                    localStorage.setItem('srp_username',      data.username);
+                    localStorage.setItem('srp_role',          data.role);
+
+                    // Redirect to dashboard with token in header (via meta redirect)
+                    window.location.href = '/dashboard';
+                } else {
+                    errBox.textContent     = '⛔ ' + (data.error || 'Invalid credentials');
+                    errBox.style.display   = 'block';
+                    btn.disabled    = false;
+                    btn.textContent = 'Authenticate';
+                }
+            } catch (err) {
+                errBox.textContent   = '⚠️ Network error. Please try again.';
+                errBox.style.display = 'block';
+                btn.disabled    = false;
+                btn.textContent = 'Authenticate';
+            }
+        }
+        </script>
     </div>
 </div>
 {% endblock %}
