@@ -1,28 +1,93 @@
-Project Name : Secure Research Dataset Sharing System with Time-Limited Access
+# 🚀 Secure Research Dataset Sharing System with Time-Limited Access
 
-Secure Research Portal is a Flask-based web application for securely managing and sharing research datasets. It implements multi-factor authentication (password + email OTP), role-based access control (Admin, Researcher, Reviewer), and hybrid encryption using AES and RSA. Passwords are protected using SHA-256 hashing with salt, and digital signatures ensure data integrity and authenticity. MongoDB is used for secure storage of users, datasets, and activity logs.
+## 📌 Project Description
 
-Tech Stack:
-JavaScript,
-HTML,
-CSS,
-React,
-Tailwind CSS,
-Node.js,
-Express.js,
-MongoDB,
+The **Secure Research Dataset Sharing System** is a web-based platform designed to securely share sensitive research datasets with controlled and time-limited access. The system ensures data confidentiality, integrity, and authorized usage through strong authentication, hybrid encryption techniques, and role-based access control.
 
+It enables researchers to upload datasets securely, allows authorized users to access them within a defined time period, and ensures secure communication using AES and RSA encryption with SHA-256 hashing for password protection.
 
-Features : 
- Multi-Factor Authentication (Password + Email OTP)   ,
- Role-Based Access Control (Admin, Researcher, Reviewer)  , 
- Hybrid Encryption (AES for data + RSA for key exchange)   ,
- Secure Password Storage using SHA-256   ,
- Secure Dataset Upload & Download   , 
- Time-Limited Dataset Access ,
- Activity Logging and Monitoring
+This platform is ideal for academic institutions, research organizations, and secure data-sharing environments where privacy and controlled access are critical.
 
-How to Run the Project: 
-pip install -r requirements.txt
-python app.py  
-http://127.0.0.1:5000
+---
+
+## ⚙️ Tech Stack
+
+* Python
+* Flask
+* HTML
+* CSS
+* JavaScript
+* MongoDB
+* AES Encryption
+* RSA Encryption
+* SHA-256 Hashing
+
+---
+
+## ⭐ Features
+
+### 🔐 Secure Authentication
+
+* User login with password and email OTP verification
+* Multi-layer authentication for enhanced security
+
+### 👥 Role-Based Access Control
+
+* Admin → manages users and datasets
+* Researcher → uploads and shares datasets
+* Reviewer → accesses shared datasets
+
+### 🔒 Hybrid Encryption Security
+
+* AES encryption for securing dataset files
+* RSA encryption for secure key exchange
+* End-to-end data protection
+
+### 🛡 Password Protection
+
+* SHA-256 hashing with salt
+* Prevents password theft and unauthorized access
+
+### ✍️ Digital Signature Verification
+
+* Ensures dataset authenticity and integrity
+* Prevents tampering or unauthorized modification
+
+### ⏳ Time-Limited Dataset Access
+
+* Datasets accessible only within defined validity period
+* Automatic access expiration
+
+### 🔗 API Integration
+
+* Backend APIs connected to frontend
+* Secure dataset upload and sharing functionality
+
+### 📊 Secure Dataset Management
+
+* Upload, store, and manage research datasets
+* Controlled access permissions
+
+---
+
+## 📸 Screenshot
+
+![Project Screenshot](images/project-image.png)
+
+---
+
+## ▶️ How to Run the Project
+
+1. Install Python and required dependencies
+2. Install packages:
+   pip install -r requirements.txt
+3. Run the Flask server:
+   python app.py
+4. Open browser:
+   http://127.0.0.1:5000
+
+---
+
+## 👨‍💻 Author
+
+**Hemanth Gudi**
