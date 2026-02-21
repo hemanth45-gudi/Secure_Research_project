@@ -50,10 +50,11 @@ class Config:
     S3_REGION        = os.environ.get('AWS_REGION', 'us-east-1')
 
     # -- Email (OTP / MFA) ---------------------------------- 
-    EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS', '')
+    EMAIL_USER     = os.environ.get('EMAIL_USER', '')
     EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
+    EMAIL_FROM     = os.environ.get('EMAIL_FROM', '')
     SMTP_SERVER    = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')
-    SMTP_PORT      = os.environ.get('SMTP_PORT', '587')
+    SMTP_PORT      = int(os.environ.get('SMTP_PORT', '587'))
     SMTP_USE_TLS   = os.environ.get('SMTP_USE_TLS', 'True').lower() == 'true'
     SMTP_USE_SSL   = os.environ.get('SMTP_USE_SSL', 'False').lower() == 'true'
 
