@@ -34,7 +34,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from auth import generate_tokens, decode_access_token, decode_refresh_token, jwt_required, role_required
+from auth import (
+    generate_tokens, decode_access_token, decode_refresh_token,
+    jwt_required, role_required, ACCESS_TOKEN_COOKIE
+)
 from config import config_map
 from core.limiter import limiter
 from core.cache   import cache
@@ -243,7 +246,7 @@ def _register_page_routes(app: Flask):
 
         return render_template('verify_email.html')
 
-    # -- Login (session bridge + JWT) -------------------- 
+    # -- Login ---------------------------------------------
     @app.route('/login', methods=['GET', 'POST'])
     def login():
         if request.method == 'POST':
@@ -252,14 +255,39 @@ def _register_page_routes(app: Flask):
             user     = users_col_fn().find_one({'username': username})
 
             if user and user.get('hash') == _hash_password(password, user.get('salt', '')):
-                session['user'] = username
-                session['role'] = user['role']
+                # JWT Token Generation
+                tokens = generate_tokens(username, user['role'])
+                now    = datetime.datetime.utcnow()
+
+                # Store refresh token in DB
+                rt_col_fn().insert_one({
+                    'username':      username,
+                    'refresh_token': tokens['refresh_token'],
+                    'issued_at':     now,
+                    'expires_at':    now + datetime.timedelta(days=7),
+                })
+
                 logs_col_fn().insert_one({
                     'user':   username,
                     'action': 'Logged In',
                     'time':   str(datetime.datetime.now()),
                 })
-                return redirect(url_for('dashboard'))
+
+                # Clear legacy session if any
+                session.clear()
+
+                # Redirect to dashboard and set HttpOnly JWT cookie
+                resp = redirect(url_for('dashboard'))
+                resp.set_cookie(
+                    ACCESS_TOKEN_COOKIE,
+                    tokens['access_token'],
+                    httponly = True,
+                    samesite = 'Lax',
+                    max_age  = 15 * 60,
+                    secure   = current_app.config.get('SESSION_COOKIE_SECURE', False),
+                    path     = '/',
+                )
+                return resp
             else:
                 flash('Invalid credentials!', 'danger')
 
@@ -413,9 +441,15 @@ def _register_page_routes(app: Flask):
     # -- Logout --------------------------------------------
     @app.route('/logout')
     def logout():
+        username = getattr(g, 'current_user', 'Unknown')
+        logs_col_fn().insert_one({
+            'user':   username,
+            'action': 'Logged Out',
+            'time':   str(datetime.datetime.now()),
+        })
         session.clear()
         resp = redirect(url_for('login'))
-        resp.delete_cookie('srp_access_token', path='/')
+        resp.delete_cookie(ACCESS_TOKEN_COOKIE, path='/')
         return resp
 
     # -- Health Check --------------------------------------

@@ -144,7 +144,7 @@
 
 <div class="container">
     <div class="glass-panel">
-        <h3 class="text-center mb-4">  Administrative User Management</h3>
+        <h3 class="text-center mb-4"> Administrative User Management</h3>
 
         <table class="custom-table">
             <thead>
@@ -165,13 +165,13 @@
                         <span class="role-badge role-{{ user_data.role|lower }}">{{ user_data.role }}</span>
                     </td>
                     <td>
-                        <span style="color: #666;">  {{ user_data.email }}</span>
+                        <span style="color: #666;"> {{ user_data.email }}</span>
                     </td>
                     <td>
-                        {% if username != session['user'] %}
+                        {% if username != g.current_user %}
                         <a href="{{ url_for('delete_user', username=username) }}" class="btn-delete"
                             onclick="return confirm('Are you sure you want to PERMANENTLY delete user {{ username }}?');">
-                              Delete
+                            Delete
                         </a>
                         {% else %}
                         <span class="text-muted small">(You)</span>
