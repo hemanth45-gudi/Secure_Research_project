@@ -146,12 +146,13 @@ http://127.0.0.1:5000
 
 ## 📸 Screenshots
 
-![Dashboard Screenshot]("p1-project.png")
-![Dashboard Screenshot]("p2-project.png")
-![Dashboard Screenshot]("p3-project.png")
-![Dashboard Screenshot]("p4-project.png")
-![Dashboard Screenshot]("p5-project.png")
-![Dashboard Screenshot]("p6-project.png")
+![Secure_Research_project]("p1-project.png")
+![Secure_Research_project]("p2-project.png")
+![Secure_Research_project]("p3-project.png")
+![Secure_Research_project]("p4-project.png")
+![Secure_Research_project]("p5-project.png")
+![Secure_Research_project]("p6-project.png")
+
 
 ---
 
