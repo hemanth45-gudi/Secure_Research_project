@@ -26,23 +26,25 @@ class LoginSchema(Schema):
     )
 
 
+def validate_password_strength(value):
+    """Enforce at least one digit and one uppercase letter."""
+    if not any(c.isdigit() for c in value):
+        raise ValidationError('Password must contain at least one digit.')
+    if not any(c.isupper() for c in value):
+        raise ValidationError('Password must contain at least one uppercase letter.')
+
 class RegisterSchema(Schema):
     username  = fields.Str(required=True, validate=validate.Length(min=3, max=50))
     email     = fields.Email(required=True)
-    password  = fields.Str(required=True, validate=validate.Length(min=8, max=128))
+    password  = fields.Str(
+        required=True, 
+        validate=[validate.Length(min=8, max=128), validate_password_strength]
+    )
     role      = fields.Str(
         required=True,
         validate=validate.OneOf(['Admin', 'Researcher', 'Reviewer'])
     )
     admin_key = fields.Str(load_default='')
-
-    @validates('password')
-    def validate_password_strength(self, value):
-        """Enforce at least one digit and one uppercase letter."""
-        if not any(c.isdigit() for c in value):
-            raise ValidationError('Password must contain at least one digit.')
-        if not any(c.isupper() for c in value):
-            raise ValidationError('Password must contain at least one uppercase letter.')
 
 
 class RefreshTokenSchema(Schema):
@@ -84,9 +86,10 @@ def validate_json(schema_class):
                 g.validated_data = schema.load(raw)
             except ValidationError as err:
                 return jsonify({
-                    'error':   'Validation failed',
+                    'success': False,
+                    'message': 'Validation failed',
                     'details': err.messages,
-                    'code':    'VALIDATION_ERROR',
+                    'code': 'VALIDATION_ERROR'
                 }), 422
             return f(*args, **kwargs)
         return decorated

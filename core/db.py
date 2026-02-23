@@ -19,15 +19,40 @@ def init_db(app):
     """Initialise the MongoDB connection from app config. Call from create_app()."""
     global _client, _db
     try:
-        _client = MongoClient(app.config['MONGO_URI'], serverSelectionTimeoutMS=5000)
-        _db = _client[app.config['MONGO_DB']]
-        # Ping to confirm connection
-        _client.admin.command('ping')
-        print(f"\n[OK MONGODB] Connected -> {app.config['MONGO_DB']}\n", flush=True)
+        if _client is None: # Don't overwrite if already set (e.g. in tests)
+            _client = MongoClient(app.config['MONGO_URI'], serverSelectionTimeoutMS=5000)
+            _db = _client[app.config['MONGO_DB']]
+        
+        # Ping to confirm connection (skip for mongomock)
+        if hasattr(_client, 'admin'):
+            _client.admin.command('ping')
+            
+            # -- Scalability: Database Indexes ---------------------
+            def safe_index(col, *args, **kwargs):
+                try:
+                    col.create_index(*args, **kwargs)
+                except Exception as e:
+                    logger.warning(f"Could not create index on {col.name} {args}: {e}")
+
+            safe_index(_db.users, 'username', unique=True)
+            safe_index(_db.users, 'email', unique=True)
+            safe_index(_db.datasets, 'uploader')
+            safe_index(_db.datasets, 'created_at')
+            safe_index(_db.logs, 'timestamp')
+            safe_index(_db.logs, 'user')
+            
+        print(f"\n[OK MONGODB] Connected & Indexed -> {app.config['MONGO_DB']}\n", flush=True)
     except Exception as e:
-        print(f"\n[ERROR MONGODB] {e}\n", flush=True)
+        print(f"\n[ERROR MONGODB] Connection failed: {e}\n", flush=True)
+        # We still raise if the connection itself fails, but index failures are warnings
         raise
     return _db
+
+def set_db_client(client):
+    """Set the database client manually (useful for testing)."""
+    global _client, _db
+    _client = client
+    _db = client['test_db']
 
 
 def get_db():

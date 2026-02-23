@@ -1,202 +1,501 @@
 {% extends "layout.html" %}
 {% block content %}
 <style>
-    /* Reuse Glassmorphism with Enhancements */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
     body {
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        /* Soft, clean beautiful gradient dashboard background */
+        background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
         min-height: 100vh;
-        color: white;
+        font-family: 'Inter', sans-serif;
+        color: #1e293b;
     }
 
-    /* Blue Background Header */
-    .glass-header {
-        font-size: 2.5rem;
-        font-weight: 900;
-        text-align: center;
-        margin-bottom: 40px;
-        background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
-        /* Blue Gradient */
-        color: white;
-        padding: 20px 40px;
-        border-radius: 50px;
-        display: inline-block;
-        /* Wraps around text */
-        box-shadow: 0 10px 20px rgba(0, 97, 255, 0.3);
-        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        border: 2px solid rgba(255, 255, 255, 0.3);
+    .page-wrapper {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 40px 20px 80px;
     }
 
+    /* Header */
     .header-container {
-        text-align: center;
-    }
-
-    .glass-card {
-        background: rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        padding: 30px;
-        margin-bottom: 25px;
-        color: #222;
-        transition: transform 0.3s;
-    }
-
-    .glass-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .btn-download {
-        background: #f5576c;
-        color: white;
-        border: none;
-        border-radius: 50px;
-        padding: 10px 20px;
-        font-weight: 700;
-        transition: all 0.3s;
-        text-decoration: none;
-        box-shadow: 0 4px 10px rgba(245, 87, 108, 0.4);
-    }
-
-    .btn-download:hover {
-        background: #fa709a;
-        transform: translateY(-2px);
-        color: white;
-        box-shadow: 0 6px 15px rgba(245, 87, 108, 0.6);
-    }
-
-    .status-badge {
-        padding: 6px 15px;
-        border-radius: 20px;
-        font-weight: bold;
-        font-size: 0.9rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .bg-active {
-        background: #d4edda;
-        color: #155724;
-    }
-
-    .bg-expired {
-        background: #f8d7da;
-        color: #721c24;
-    }
-
-    .file-item {
-        background: rgba(255, 255, 255, 0.6);
-        border-radius: 12px;
-        padding: 15px;
-        margin-bottom: 15px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-left: 4px solid #4facfe;
+        margin-bottom: 32px;
+        padding: 0 8px;
     }
 
-    .back-btn-container {
-        text-align: center;
-        margin-top: 60px;
-        margin-bottom: 60px;
-    }
-
-    /* Prominent Glow Button */
-    .btn-back-glow {
-        background: linear-gradient(45deg, #11998e 0%, #38ef7d 100%);
-        color: white;
-        padding: 18px 50px;
+    .dashboard-title {
+        font-size: 2rem;
         font-weight: 800;
-        font-size: 1.2rem;
-        border-radius: 50px;
-        border: none;
-        box-shadow: 0 0 20px rgba(56, 239, 125, 0.4);
-        transition: all 0.3s;
-        text-decoration: none;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.5px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* Dataset card */
+    .dataset-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 32px 36px;
+        margin-bottom: 32px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s ease;
+    }
+
+    .dataset-card:hover {
+        box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        transform: translateY(-2px);
+    }
+
+    .dataset-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .dataset-title {
+        margin: 0;
+        font-weight: 800;
+        font-size: 1.35rem;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .dataset-title code {
+        background: #f1f5f9;
+        color: #3b82f6;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 700;
+        border: 1px solid #e2e8f0;
+    }
+
+    .dataset-meta {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 28px;
+        border: 1px solid #f1f5f9;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .dataset-meta p {
+        margin: 0;
+        font-size: 0.95rem;
+        color: #475569;
+        line-height: 1.5;
+    }
+
+    .dataset-meta strong {
+        color: #1e293b;
+        font-weight: 700;
+        margin-right: 6px;
         display: inline-block;
+        min-width: 90px;
+    }
+
+    /* Status badge (dataset level) */
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-active {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .badge-expired {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    /* File row */
+    .files-section-title {
+        color: #64748b;
+        font-weight: 800;
+        font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 1px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #f1f5f9;
     }
 
-    .btn-back-glow:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 0 35px rgba(56, 239, 125, 0.7);
+    .file-row {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 16px;
+        border-left: 4px solid #cbd5e1;
+        transition: all 0.2s;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+    }
+
+    .file-row:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
+    .file-row.sig-ok {
+        border-left-color: #10b981;
+    }
+
+    .file-row.sig-fail {
+        border-left-color: #ef4444;
+    }
+
+    .file-row.file-expired {
+        border-left-color: #f59e0b;
+    }
+
+    /* File Details Grid */
+    .file-details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #f1f5f9;
+    }
+
+    .file-details-item {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .file-details-label {
+        color: #64748b;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+    }
+
+    .file-details-value {
+        color: #1e293b;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+    }
+
+    /* Signature badges */
+    .sig-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .sig-valid {
+        background: #ecfdf5;
+        color: #059669;
+        border: 1px solid #a7f3d0;
+    }
+
+    .sig-invalid {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+        animation: pulse-red-light 2s infinite;
+    }
+
+    @keyframes pulse-red-light {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+        }
+
+        50% {
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15);
+        }
+    }
+
+    /* Expiry */
+    .expiry-line {
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 0 0 0;
+        border-top: 1px dashed #cbd5e1;
+    }
+
+    .expiry-ok {
+        color: #475569;
+    }
+
+    .expiry-ok strong {
+        color: #1e293b;
+    }
+
+    .expiry-expired {
+        color: #b91c1c;
+    }
+
+    /* Download buttons */
+    .btn-dl-ok {
+        background: #10b981;
         color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 28px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s;
+        white-space: nowrap;
+        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
+    }
+
+    .btn-dl-ok:hover {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.15);
+        color: white;
+    }
+
+    .btn-dl-ok:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px -1px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-dl-blocked {
+        background: #334155;
+        color: #f1f5f9;
+        border: 1px solid #1e293b;
+        border-radius: 8px;
+        padding: 12px 28px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: not-allowed;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .block-reason {
+        font-size: 0.85rem;
+        color: #dc2626;
+        text-align: right;
+        font-weight: 600;
+        margin-top: 8px;
+        line-height: 1.5;
+    }
+
+    /* Empty state */
+    .empty-card {
+        background: #ffffff;
+        border: 2px dashed #cbd5e1;
+        border-radius: 16px;
+        padding: 80px 40px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .empty-card h4 {
+        color: #1e293b;
+        font-weight: 800;
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+    }
+
+    .empty-card p {
+        font-size: 1.05rem;
+    }
+
+    /* Back button */
+    .btn-back {
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 10px 24px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #020617;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-back:hover {
+        background: #1e293b;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 10px -1px rgba(0, 0, 0, 0.4);
     }
 </style>
 
-<div class="container">
+<div class="page-wrapper">
     <div class="header-container">
-        <h2 class="glass-header">  Shared Research Datasets</h2>
+        <h2 class="dashboard-title">
+            <span style="font-size: 1.8rem;">🗂</span> Shared Research Datasets
+        </h2>
+        <a href="{{ url_for('dashboard') }}" class="btn-back">
+            <span style="font-size: 1.1rem;">←</span> Back to Dashboard
+        </a>
     </div>
 
     {% if not data %}
-    <div class="glass-card text-center text-white" style="background: rgba(255,255,255,0.1);">
-        <h4>No active datasets found.</h4>
-        <p>Wait for researchers to upload data.</p>
+    <div class="empty-card">
+        <span style="font-size: 3.5rem; margin-bottom: 20px; display: block;">📂</span>
+        <h4>No datasets available</h4>
+        <p>There are currently no datasets shared securely for your review.</p>
     </div>
     {% endif %}
 
     {% for ds in data %}
-    <div class="glass-card">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="m-0" style="font-weight: 700;">Dataset #{{ ds.id }}</h5>
-            <span class="status-badge {{ 'bg-expired' if ds.status == 'expired' else 'bg-active' }}">
-                {{ '  ACCESS EXPIRED' if ds.status == 'expired' else '[OK] Active' }}
+    <div class="dataset-card">
+        <!-- Dataset header -->
+        <div class="dataset-header">
+            <h5 class="dataset-title">
+                📦 Dataset <code>#{{ ds.id }}</code>
+            </h5>
+            {% set any_active = ds.files | selectattr('accessible') | list %}
+            <span class="status-badge {{ 'badge-active' if any_active else 'badge-expired' }}">
+                {% if any_active %}
+                <span style="font-size:1.1rem">✅</span> Active
+                {% else %}
+                <span style="font-size:1.1rem">⏰</span> All Expired
+                {% endif %}
             </span>
         </div>
 
-        <p class="mb-1"><strong>Owner:</strong> {{ ds.owner }}</p>
-        <p class="mb-3"><strong>Description:</strong> {{ ds.description }}</p>
+        <div class="dataset-meta">
+            <p><strong>Owner:</strong> {{ ds.owner }} ({{ ds.owner_role }})</p>
+            <p><strong>Description:</strong> {{ ds.description }}</p>
+        </div>
 
-        <hr style="opacity: 0.2">
+        <h6 class="files-section-title">
+            <span style="font-size: 1.1rem">📁</span> Attached Files ({{ ds.files | length }})
+        </h6>
 
-        {% if ds.status == 'active' %}
-        <h6 class="mb-3">Available Files:</h6>
         {% for file in ds.files %}
-        <div class="file-item">
-            <div>
-                <strong style="font-size: 1.1em;">  {{ file.filename }}</strong><br>
-                <small class="text-muted">
+        <div
+            class="file-row {% if file.accessible %}sig-ok{% elif not file.signature_valid %}sig-fail{% else %}file-expired{% endif %}">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-4">
+
+                <!-- Left: file info -->
+                <div style="flex:1; min-width:300px;">
+                    <div class="file-details-grid">
+                        <div class="file-details-item">
+                            <span class="file-details-label">File / Dataset Name</span>
+                            <span class="file-details-value">📄 {{ file.filename }}</span>
+                        </div>
+                        <div class="file-details-item">
+                            <span class="file-details-label">File Size</span>
+                            <span class="file-details-value">💾 {{ (file.file_size / 1024)|round(2) }} KB</span>
+                        </div>
+                        <div class="file-details-item">
+                            <span class="file-details-label">Upload Date</span>
+                            <span class="file-details-value">📅 {{ ds.upload_time.strftime('%d %b %Y, %I:%M %p') if
+                                ds.upload_time else 'Unknown' }}</span>
+                        </div>
+                        <div class="file-details-item">
+                            <span class="file-details-label">Access Permission</span>
+                            <span class="file-details-value">🔐 Reviewer Only</span>
+                        </div>
+                    </div>
+
+                    <!-- Digital Signature Status -->
                     {% if file.signature_valid %}
-                    <span style="color: green; font-weight: bold;">[OK] Signature Verified</span>
+                    <div class="sig-badge sig-valid">
+                        <span style="font-size:1.1rem">✅</span> Digital Signature Verified
+                    </div>
                     {% else %}
-                    <span style="color: red; font-weight: bold;">[ERROR] Signature Invalid</span>
+                    <div class="sig-badge sig-invalid">
+                        <span style="font-size:1.1rem">❌</span> Digital Signature Failed (Tampered / Invalid Key)
+                    </div>
                     {% endif %}
-                </small>
-                <br>
-                {% if file.expiry %}
-                <small class="text-danger">Expires: {{ file.expiry.strftime('%H:%M:%S') }}</small>
-                {% endif %}
+
+                    <!-- Expiry / Access Time -->
+                    <div class="expiry-line {% if file.is_expired %}expiry-expired{% else %}expiry-ok{% endif %}">
+                        {% if file.expiry %}
+                        {% if file.is_expired %}
+                        <span style="font-size:1.1rem">⏰</span> <strong>Access Expired:</strong> {{
+                        file.expiry.strftime('%d %b %Y at %I:%M:%S %p') }}
+                        {% else %}
+                        <span style="font-size:1.1rem">🕐</span> <strong>Accessible Until:</strong> {{
+                        file.expiry.strftime('%d %b %Y at %I:%M:%S %p') }}
+                        {% endif %}
+                        {% else %}
+                        ⚠️ <strong>No expiry time set</strong>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Right: download button -->
+                <div
+                    style="text-align:right; min-width:200px; display:flex; flex-direction:column; align-items:flex-end;">
+                    {% if file.accessible %}
+                    <a href="data:application/octet-stream;base64,{{ file.download_data }}"
+                        download="{{ file.filename }}" class="btn-dl-ok">
+                        <span style="font-size:1.1rem">⬇</span> Download File
+                    </a>
+
+                    {% elif not file.signature_valid %}
+                    <span class="btn-dl-blocked">🔒 Download Blocked</span>
+                    <div class="block-reason">Signature verification failed.<br>File may be tampered.</div>
+
+                    {% else %}
+                    <span class="btn-dl-blocked">⏰ Access Expired</span>
+                    <div class="block-reason">Time window has closed.<br>Contact the researcher.</div>
+                    {% endif %}
+                </div>
+
             </div>
-            {% if file.signature_valid %}
-            <a href="data:application/octet-stream;base64,{{ file.download_data }}" download="{{ file.filename }}"
-                class="btn-download">
-                  Download
-            </a>
-            {% else %}
-            <button class="btn-download" style="background: #555; cursor: not-allowed; box-shadow: none;" disabled
-                title="File signature does not match owner's public key.">
-                  Download Blocked
-            </button>
-            {% endif %}
         </div>
         {% endfor %}
-        {% else %}
-        <div class="text-center p-3" style="background: rgba(0,0,0,0.05); border-radius: 10px;">
-            <h3 style="opacity: 0.5;"> </h3>
-            <p class="text-danger mb-0">Encryption Keys Destroyed</p>
-        </div>
-        {% endif %}
+
     </div>
     {% endfor %}
 
-    <div class="back-btn-container">
-        <a href="{{ url_for('dashboard') }}" class="btn-back-glow">
-            &larr; Back to Dashboard
-        </a>
-    </div>
 </div>
 {% endblock %}

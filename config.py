@@ -82,6 +82,7 @@ class TestingConfig(Config):
     MONGO_DB              = 'secure_research_test_db'
     CACHE_TYPE            = 'SimpleCache'
     RATELIMIT_STORAGE_URI = 'memory://'
+    RATELIMIT_ENABLED     = False
 
 
 config_map = {

@@ -147,7 +147,7 @@
                 btn.textContent = 'Authenticating ';
 
                 try {
-                    const res = await fetch('/api/auth/login', {
+                    const res = await fetch('/api/v1/auth/login', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username, password }),
@@ -155,17 +155,19 @@
 
                     const data = await res.json();
 
-                    if (res.ok && data.access_token) {
-                        // [OK] Store tokens in localStorage
-                        localStorage.setItem('srp_access_token', data.access_token);
-                        localStorage.setItem('srp_refresh_token', data.refresh_token);
-                        localStorage.setItem('srp_username', data.username);
-                        localStorage.setItem('srp_role', data.role);
+                    if (res.ok && data.success && data.data) {
+                        // [OK] Store tokens in localStorage (cookie is also set by server)
+                        localStorage.setItem('srp_access_token', data.data.access_token);
+                        localStorage.setItem('srp_refresh_token', data.data.refresh_token);
+                        localStorage.setItem('srp_username', data.data.username);
+                        localStorage.setItem('srp_role', data.data.role);
 
-                        // Redirect to dashboard with token in header (via meta redirect)
+                        // Redirect to dashboard — srp_access_token cookie was set by the API
                         window.location.href = '/dashboard';
                     } else {
-                        errBox.textContent = '  ' + (data.error || 'Invalid credentials');
+                        // Extract message from data.message (new standard) or data.error.message (old)
+                        const errorMsg = data.message || (data.error && data.error.message) || 'Invalid credentials';
+                        errBox.textContent = '  ' + errorMsg;
                         errBox.style.display = 'block';
                         btn.disabled = false;
                         btn.textContent = 'Authenticate';
