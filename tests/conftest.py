@@ -7,12 +7,16 @@ from core.db import set_db_client
 @pytest.fixture(scope='session')
 def app():
     """Create and configure a new app instance for each test session."""
-    os.environ['FLASK_ENV'] = 'testing'
-    app = create_app('testing')
+    import mongomock
+    from core.db import set_db_client
     
     # Use mongomock for testing to avoid needing a real MongoDB
+    # MUST be set before create_app so init_db finds it
     mock_client = mongomock.MongoClient()
     set_db_client(mock_client)
+
+    os.environ['FLASK_ENV'] = 'testing'
+    app = create_app('testing')
     
     yield app
 
@@ -27,7 +31,7 @@ def runner(app):
     return app.test_cli_runner()
 
 @pytest.fixture(autouse=True)
-def clean_db():
+def clean_db(app):
     """Cleans the mock database before each test."""
     from core.db import get_db
     db = get_db()

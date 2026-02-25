@@ -18,3 +18,4 @@ mongomock
 fakeredis
 boto3
 pydantic
+psutil
