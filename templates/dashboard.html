@@ -3,27 +3,121 @@
 <h4 class="mb-4">Welcome, <b>{{ user }}</b> <span class="badge bg-secondary">{{ role }}</span></h4>
 
 <div class="list-group">
-    {% if role == 'Researcher' %}
-    <a href="{{ url_for('upload_dataset') }}" class="list-group-item list-group-item-action list-group-item-warning">
-          <b>Upload Secure Dataset</b> (Encrypt & Sign)
-    </a>
-    {% endif %}
+      {% if role == 'Researcher' %}
+      <a href="{{ url_for('upload_dataset') }}" class="list-group-item list-group-item-action list-group-item-warning">
+            <b>Upload Secure Dataset</b> (Encrypt & Sign)
+      </a>
+      {% endif %}
 
-    {% if role == 'Reviewer' %}
-    <a href="{{ url_for('view_datasets') }}" class="list-group-item list-group-item-action list-group-item-info">
-           <b>View Shared Datasets</b> (Verify Signature)
-    </a>
-    {% endif %}
+      {% if role == 'Reviewer' %}
+      <a href="{{ url_for('view_datasets') }}" class="list-group-item list-group-item-action list-group-item-info">
+            <b>View Shared Datasets</b> (Verify Signature)
+      </a>
+      {% endif %}
 
-    {% if role == 'Admin' %}
-    <a href="{{ url_for('view_logs') }}" class="list-group-item list-group-item-action list-group-item-dark">
-          <b>View Access Logs</b> (Audit)
-    </a>
-    <a href="{{ url_for('manage_users') }}" class="list-group-item list-group-item-action list-group-item-primary mt-2">
-          <b>Manage Users</b> (List/Delete)
-    </a>
-    {% endif %}
+      {% if role == 'Admin' %}
+      <a href="{{ url_for('view_logs') }}" class="list-group-item list-group-item-action list-group-item-dark">
+            <b>View Access Logs</b> (Audit)
+      </a>
+      <a href="{{ url_for('manage_users') }}"
+            class="list-group-item list-group-item-action list-group-item-primary mt-2">
+            <b>Manage Users</b> (List/Delete)
+      </a>
+      {% endif %}
 
-    <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-danger mt-3">Logout</a>
+      <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-danger mt-3">Logout</a>
 </div>
+
+<div class="mt-5">
+      <h5 class="mb-3 text-primary"><i class="bi bi-bar-chart-fill"></i> System Performance & Security Metrics</h5>
+      <div class="row g-3">
+            <div class="col-md-4">
+                  <div class="card metric-card text-center h-100 shadow-sm">
+                        <div class="card-body">
+                              <h6 class="text-muted">Total Requests</h6>
+                              <h3 id="total-requests" class="fw-bold">0</h3>
+                              <div class="progress mt-2" style="height: 5px;">
+                                    <div id="success-bar" class="progress-bar bg-success" style="width: 0%"></div>
+                                    <div id="failure-bar" class="progress-bar bg-danger" style="width: 0%"></div>
+                              </div>
+                              <small class="text-muted"><span id="success-rate">0%</span> Success Rate</small>
+                        </div>
+                  </div>
+            </div>
+            <div class="col-md-4">
+                  <div class="card metric-card text-center h-100 shadow-sm">
+                        <div class="card-body">
+                              <h6 class="text-muted">Avg Response Time</h6>
+                              <h3 id="avg-response" class="fw-bold text-info">0ms</h3>
+                              <small class="text-muted">Real-time Benchmark</small>
+                        </div>
+                  </div>
+            </div>
+            <div class="col-md-4">
+                  <div class="card metric-card text-center h-100 shadow-sm">
+                        <div class="card-body">
+                              <h6 class="text-muted">Security Layers Active</h6>
+                              <div id="security-layers" class="mt-2">
+                                    <!-- Layers will be injected here -->
+                              </div>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>
+
+<script>
+      async function updateMetrics() {
+            try {
+                  const res = await fetch('/api/v1/metrics/summary');
+                  const data = await res.json();
+
+                  document.getElementById('total-requests').textContent = data.total_requests;
+                  document.getElementById('avg-response').textContent = data.avg_response_time_ms;
+                  document.getElementById('success-rate').textContent = data.success_rate;
+
+                  const total = data.total_requests || 1;
+                  const successPct = (data.success_count / total) * 100;
+                  const failurePct = (data.failure_count / total) * 100;
+
+                  document.getElementById('success-bar').style.width = successPct + '%';
+                  document.getElementById('failure-bar').style.width = failurePct + '%';
+
+                  const layersDiv = document.getElementById('security-layers');
+                  layersDiv.innerHTML = data.security_layers.map(layer =>
+                        `<span class="badge bg-primary m-1">${layer}</span>`
+                  ).join('');
+            } catch (err) {
+                  console.error('Failed to fetch metrics:', err);
+            }
+      }
+
+      // Initial update
+      updateMetrics();
+      // Refresh every 5 seconds
+      setInterval(updateMetrics, 5000);
+</script>
+
+<style>
+      .metric-card {
+            border-radius: 12px;
+            border: none;
+            transition: transform 0.2s ease, shadow 0.2s ease;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+      }
+
+      .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+      }
+
+      .text-primary {
+            color: #4361ee !important;
+      }
+
+      .badge.bg-primary {
+            background-color: #4361ee !important;
+      }
+</style>
 {% endblock %}

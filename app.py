@@ -13,6 +13,7 @@ from core.cache import cache
 from core.db import init_db
 from core.exceptions import BaseAppException
 from auth import jwt_required, role_required, ACCESS_TOKEN_COOKIE
+from core.metrics import metrics_tracker
 
 def create_app(env: str = None) -> Flask:
     if env is None:
@@ -147,6 +148,20 @@ def create_app(env: str = None) -> Flask:
 
     # -- Page Routes (backward-compatible browser UI) -------- 
     _register_page_routes(app)
+
+    @app.before_request
+    def before_request():
+        metrics_tracker.start_request()
+
+    @app.after_request
+    def after_request(response):
+        metrics_tracker.end_request(response)
+        return response
+
+    @app.route('/api/v1/metrics/summary')
+    @jwt_required
+    def get_metrics_summary():
+        return jsonify(metrics_tracker.get_summary())
 
     print(f"\n[[OK] APP] Started in '{env}' mode on port 5000\n", flush=True)
     return app
